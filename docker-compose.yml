@@ -112,6 +112,39 @@ services:
       - mongodb
 
   # ===============
+  # Services
+  # ===============
+  web-asap:
+    image: python:3.10.6-slim-bullseye
+    container_name: web-asap
+    hostname: web-asap
+    volumes:
+      - ./services/asap:/usr/src/app
+    environment:
+      DB_HOSTNAME: mongodb
+      DB_PORT: 27017
+      DB_USERNAME: root
+      DB_PASSWORD: 123456
+      DB_NAME:
+      TZ: Asia/Makassar
+    networks:
+      - services-db
+      - services-proxy
+    working_dir: /usr/src/app
+    command: /bin/bash -c "pip3 install flask && python app.py"
+    labels:
+      - traefik.enable=true
+      - traefik.http.middlewares.web-asap.stripprefix.forceslash=false
+      - traefik.http.middlewares.web-asap.stripprefix.prefixes=/asap/,/asap
+      - traefik.http.routers.web-asap.entrypoints=websecure
+      - traefik.http.routers.web-asap.middlewares=web-asap
+      - traefik.http.routers.web-asap.rule=(Host(`myiot.com`) && (PathPrefix(`/asap/`) || PathPrefix(`/asap`)))
+      - traefik.http.routers.web-asap.service=web-asap
+      - traefik.http.routers.web-asap.tls.certresolver=leresolver
+      - traefik.http.routers.web-asap.tls=true
+      - traefik.http.services.web-asap.loadbalancer.server.port=80
+
+  # ===============
   # DB Tester
   # ===============
   whoami:
@@ -122,7 +155,7 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.whoami.entrypoints=websecure
-      - traefik.http.routers.whoami.rule=((Host(`myiot.com`) && Path(`/whoami`)) || Host(`myiot.com`))
+      - traefik.http.routers.whoami.rule=(Host(`myiot.com`) && Path(`/whoami`))
       - traefik.http.routers.whoami.service=whoami
       - traefik.http.routers.whoami.tls.certresolver=leresolver
       - traefik.http.routers.whoami.tls=true
