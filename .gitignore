@@ -1,6 +1,2 @@
-db-asap/data/*
-db-cahaya/data/*
-db-gerak/data/*
-db-suhukelembapan/data/*
-db-gerak/data/*
+mongodb/*
 !**/*.gitkeep

@@ -1,9 +1,13 @@
 version: "3.3"
 
 services:
+  # ===============
+  # Proxy
+  # ===============
   traefik:
-    container_name: traefik
     image: "traefik:latest"
+    container_name: traefik
+    hostname: traefik
     command:
       - --api
       - --certificatesresolvers.leresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory
@@ -22,6 +26,8 @@ services:
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
       - "./traefik/acme.json:/acme.json"
+    environment:
+      - TZ=Asia/Makassar
     labels:
       - traefik.enable=true
       - traefik.http.routers.traefik.entrypoints=websecure
@@ -38,6 +44,9 @@ services:
       - services-proxy
       - services-db
 
+  # ===============
+  # Container Manager
+  # ===============
   portainer:
     image: portainer/portainer-ce:latest
     container_name: portainer
@@ -54,44 +63,62 @@ services:
       - traefik.http.routers.portainer.tls.certresolver=leresolver
       - traefik.http.routers.portainer.tls=true
       - traefik.http.services.portainer.loadbalancer.server.port=9000
+    environment:
+      - TZ=Asia/Makassar
     networks:
       - services-proxy
 
-  mongo:
+  # ===============
+  # Database
+  # ===============
+  mongodb:
     image: mongo
-    restart: always
-    container_name: mongo
+    container_name: mongodb
+    hostname: mongodb
     volumes:
-      - ./mongo/data:/data/db
+      - ./mongodb:/data/db
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: 123456
+      TZ: Asia/Makassar
     networks:
       - services-db
 
+  # ===============
+  # DB Manager
+  # ===============
   mongo-express:
     #port:8081
     image: mongo-express
     container_name: mongo-express
+    hostname: mongo-express
     environment:
       ME_CONFIG_MONGODB_ADMINUSERNAME: root
       ME_CONFIG_MONGODB_ADMINPASSWORD: 123456
-      ME_CONFIG_MONGODB_URL: mongodb://root:123456@mongo:27017/
+      ME_CONFIG_MONGODB_URL: mongodb://root:123456@mongodb:27017/
+      TZ: Asia/Makassar
     networks:
       - services-db
       - services-proxy
     labels:
       - traefik.enable=true
       - traefik.http.routers.mongo-express.entrypoints=websecure
-      - traefik.http.routers.mongo-express.rule=Host(`mongo.myiot.com`)
+      - traefik.http.routers.mongo-express.rule=Host(`db.myiot.com`)
       - traefik.http.routers.mongo-express.service=mongo-express
       - traefik.http.routers.mongo-express.tls.certresolver=leresolver
       - traefik.http.routers.mongo-express.tls=true
       - traefik.http.services.mongo-express.loadbalancer.server.port=8081
-      
+    depends_on:
+      - mongodb
+
+  # ===============
+  # DB Tester
+  # ===============
   whoami:
     image: traefik/whoami
     container_name: whoami
+    environment:
+      TZ: Asia/Makassar
     labels:
       - traefik.enable=true
       - traefik.http.routers.whoami.entrypoints=websecure
