@@ -1,0 +1,112 @@
+version: "3.3"
+
+services:
+  traefik:
+    container_name: traefik
+    image: "traefik:latest"
+    command:
+      - --api
+      - --certificatesresolvers.leresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory
+      - --certificatesresolvers.leresolver.acme.email=mr.unlistedi@gmail.com #Set your email address here, is for the generation of SSL certificates with Let's Encrypt. 
+      - --certificatesresolvers.leresolver.acme.httpchallenge.entrypoint=web
+      - --certificatesresolvers.leresolver.acme.httpchallenge=true
+      - --certificatesresolvers.leresolver.acme.storage=./acme.json
+      - --certificatesresolvers.leresolver.acme.tlschallenge=true
+      - --entrypoints.web.address=:80
+      - --entrypoints.websecure.address=:443
+      - --log.level=ERROR
+      - --providers.docker
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "./traefik/acme.json:/acme.json"
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.traefik.entrypoints=websecure
+      - traefik.http.routers.traefik.rule=Host(`traefik.myiot.com`)
+      - traefik.http.routers.traefik.service=api@internal
+      - traefik.http.routers.traefik.tls.certresolver=leresolver
+      - traefik.http.routers.traefik.tls=true
+      # Redirect HTTP -> HTTPS
+      - traefik.http.routers.http-catchall.rule=hostregexp(`{host:.+}`)
+      - traefik.http.routers.http-catchall.entrypoints=web
+      - traefik.http.routers.http-catchall.middlewares=redirect-to-https
+      - traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https
+    networks:
+      - services-proxy
+      - services-db
+
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: portainer
+    command: -H unix:///var/run/docker.sock
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./portainer/data:/data
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.portainer.entrypoints=websecure
+      - traefik.http.routers.portainer.rule=Host(`portainer.myiot.com`)
+      - traefik.http.routers.portainer.service=portainer
+      - traefik.http.routers.portainer.tls.certresolver=leresolver
+      - traefik.http.routers.portainer.tls=true
+      - traefik.http.services.portainer.loadbalancer.server.port=9000
+    networks:
+      - services-proxy
+
+  mongo:
+    image: mongo
+    restart: always
+    container_name: mongo
+    volumes:
+      - ./mongo/data:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: 123456
+    networks:
+      - services-db
+
+  mongo-express:
+    #port:8081
+    image: mongo-express
+    container_name: mongo-express
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: 123456
+      ME_CONFIG_MONGODB_URL: mongodb://root:123456@mongo:27017/
+    networks:
+      - services-db
+      - services-proxy
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.mongo-express.entrypoints=websecure
+      - traefik.http.routers.mongo-express.rule=Host(`mongo.myiot.com`)
+      - traefik.http.routers.mongo-express.service=mongo-express
+      - traefik.http.routers.mongo-express.tls.certresolver=leresolver
+      - traefik.http.routers.mongo-express.tls=true
+      - traefik.http.services.mongo-express.loadbalancer.server.port=8081
+      
+  whoami:
+    image: traefik/whoami
+    container_name: whoami
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.whoami.entrypoints=websecure
+      - traefik.http.routers.whoami.rule=((Host(`myiot.com`) && Path(`/whoami`)) || Host(`myiot.com`))
+      - traefik.http.routers.whoami.service=whoami
+      - traefik.http.routers.whoami.tls.certresolver=leresolver
+      - traefik.http.routers.whoami.tls=true
+      - traefik.http.services.whoami.loadbalancer.server.port=80
+    networks:
+      - services-proxy
+
+networks:
+  services-proxy:
+  services-db:
+
+
+volumes:
+  portainer_data:

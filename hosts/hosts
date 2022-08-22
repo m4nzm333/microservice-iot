@@ -1,0 +1,5 @@
+# Host for Microservice
+127.0.0.1 myiot.com
+127.0.0.1 portainer.myiot.com
+127.0.0.1 traefik.myiot.com
+127.0.0.1 mongo.myiot.com
