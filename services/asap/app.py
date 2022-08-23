@@ -17,6 +17,9 @@ def index():
     return 'Selamat datang di api asap'
 
 
+# ===============
+# CRUD Device
+# ===============
 @app.route('/devices/getAll')
 def getDevicesAll():
     mycol = mydb["devices"]
@@ -60,6 +63,38 @@ def insertDevices():
     }
     mycol = mydb["devices"]
     mycol.insert_one(mydict)
+    return 'success'
+
+
+@app.route('/devices/update', methods=['POST'])
+def updateDeviceById():
+    idDevice = request.form.get('id')
+    nama = request.form.get('nama')
+    rumah = request.form.get('rumah')
+
+    mycol = mydb["devices"]
+    myquery = {
+        "jenis": "sensor_asap",
+        "id": idDevice
+    }
+
+    if (nama):
+        newvalues = {"$set": {"nama": nama}}
+        mycol.update_one(myquery, newvalues)
+    if (rumah):
+        newvalues = {"$set": {"rumah": rumah}}
+        mycol.update_one(myquery, newvalues)
+    return 'success'
+
+
+@app.route('/devices/delete')
+def deleteById():
+    idDevice = request.args.get('id')
+    myquery = {
+        "id": idDevice
+    }
+    mycol = mydb["devices"]
+    mycol.delete_one(myquery)
     return 'success'
 
 
