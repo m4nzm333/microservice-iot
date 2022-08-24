@@ -72,7 +72,7 @@ services:
   # Database
   # ===============
   mongodb:
-    image: mongo
+    image: mongo:4.4.6
     container_name: mongodb
     hostname: mongodb
     ports:
