@@ -75,6 +75,8 @@ services:
     image: mongo
     container_name: mongodb
     hostname: mongodb
+    ports:
+      - 27017:27017
     volumes:
       - ./mongodb:/data/db
     environment:
@@ -114,10 +116,10 @@ services:
   # ===============
   # Services
   # ===============
-  web-asap:
+  api-asap:
     image: python:3.10.6-slim-bullseye
-    container_name: web-asap
-    hostname: web-asap
+    container_name: api-asap
+    hostname: api-asap
     volumes:
       - ./services/asap:/usr/src/app
     environment:
@@ -125,13 +127,13 @@ services:
       DB_PORT: 27017
       DB_USERNAME: root
       DB_PASSWORD: 123456
-      DB_NAME:
+      DB_NAME: myiot
       TZ: Asia/Makassar
     networks:
       - services-db
       - services-proxy
     working_dir: /usr/src/app
-    command: /bin/bash -c "pip3 install flask && python app.py"
+    command: /bin/bash -c "pip3 install -r requirements.txt && python app.py"
     labels:
       - traefik.enable=true
       - traefik.http.middlewares.web-asap.stripprefix.forceslash=false
@@ -142,7 +144,7 @@ services:
       - traefik.http.routers.web-asap.service=web-asap
       - traefik.http.routers.web-asap.tls.certresolver=leresolver
       - traefik.http.routers.web-asap.tls=true
-      - traefik.http.services.web-asap.loadbalancer.server.port=80
+      - traefik.http.services.web-asap.loadbalancer.server.port=8080
 
   # ===============
   # DB Tester
