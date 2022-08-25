@@ -75,6 +75,7 @@ services:
     image: mongo:4.4.6
     container_name: mongodb
     hostname: mongodb
+    restart: always
     ports:
       - 27017:27017
     volumes:
@@ -140,11 +141,41 @@ services:
       - traefik.http.middlewares.web-asap.stripprefix.prefixes=/asap/,/asap
       - traefik.http.routers.web-asap.entrypoints=websecure
       - traefik.http.routers.web-asap.middlewares=web-asap
-      - traefik.http.routers.web-asap.rule=(Host(`myiot.com`) && (PathPrefix(`/asap/`) || PathPrefix(`/asap`)))
+      - traefik.http.routers.web-asap.rule=(Host(`api.myiot.com`) && (PathPrefix(`/asap/`) || PathPrefix(`/asap`)))
       - traefik.http.routers.web-asap.service=web-asap
       - traefik.http.routers.web-asap.tls.certresolver=leresolver
       - traefik.http.routers.web-asap.tls=true
       - traefik.http.services.web-asap.loadbalancer.server.port=8080
+
+  api-control:
+    image: python:3.10.6-slim-bullseye
+    container_name: api-control
+    hostname: api-control
+    volumes:
+      - ./services/control:/usr/src/app
+    environment:
+      DB_HOSTNAME: mongodb
+      DB_PORT: 27017
+      DB_USERNAME: root
+      DB_PASSWORD: 123456
+      DB_NAME: myiot
+      TZ: Asia/Makassar
+    networks:
+      - services-db
+      - services-proxy
+    working_dir: /usr/src/app
+    command: /bin/bash -c "pip3 install -r requirements.txt && python app.py"
+    labels:
+      - traefik.enable=true
+      - traefik.http.middlewares.web-control.stripprefix.forceslash=false
+      - traefik.http.middlewares.web-control.stripprefix.prefixes=/control/,/control
+      - traefik.http.routers.web-control.entrypoints=websecure
+      - traefik.http.routers.web-control.middlewares=web-control
+      - traefik.http.routers.web-control.rule=(Host(`api.myiot.com`) && (PathPrefix(`/control/`) || PathPrefix(`/control`)))
+      - traefik.http.routers.web-control.service=web-control
+      - traefik.http.routers.web-control.tls.certresolver=leresolver
+      - traefik.http.routers.web-control.tls=true
+      - traefik.http.services.web-control.loadbalancer.server.port=8080
 
   # ===============
   # DB Tester
