@@ -1,5 +1,16 @@
 # Host for Microservice
 127.0.0.1 myiot.com
-127.0.0.1 portainer.myiot.com
 127.0.0.1 traefik.myiot.com
-127.0.0.1 mongo.myiot.com
+127.0.0.1 whoami.myiot.com
+127.0.0.1 api.myiot.com
+127.0.0.1 portainer.myiot.com
+127.0.0.1 db.myiot.com
+127.0.0.1 api.myiot.com
+
+10.0.0.118 myiot.com
+10.0.0.118 traefik.myiot.com
+10.0.0.118 whoami.myiot.com
+10.0.0.118 api.myiot.com
+10.0.0.118 portainer.myiot.com
+10.0.0.118 db.myiot.com
+10.0.0.118 api.myiot.com

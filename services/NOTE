@@ -1,8 +1,0 @@
-Untuk Generate semua package ke requirement.txt 
-
-$ pip install pipreqs
-$ python -m  pipreqs.pipreqs --encoding utf-8  /path/to/project
-
-Untuk menginstall gunakan
-
-$ pip3 install -r requirements.txt
