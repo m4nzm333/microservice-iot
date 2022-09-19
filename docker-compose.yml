@@ -117,18 +117,13 @@ services:
   # ===============
   # Services
   # ===============
-  api-asap:
+  web-landing:
     image: python:3.10.6-slim-bullseye
-    container_name: api-asap
-    hostname: api-asap
+    container_name: web-landing
+    hostname: web-landing
     volumes:
-      - ./services/asap:/usr/src/app
+      - ./services/landing:/usr/src/app
     environment:
-      DB_HOSTNAME: mongodb
-      DB_PORT: 27017
-      DB_USERNAME: root
-      DB_PASSWORD: 123456
-      DB_NAME: myiot
       TZ: Asia/Makassar
     networks:
       - services-db
@@ -137,22 +132,19 @@ services:
     command: /bin/bash -c "pip3 install -r requirements.txt && python app.py"
     labels:
       - traefik.enable=true
-      - traefik.http.middlewares.web-asap.stripprefix.forceslash=false
-      - traefik.http.middlewares.web-asap.stripprefix.prefixes=/asap/,/asap
-      - traefik.http.routers.web-asap.entrypoints=websecure
-      - traefik.http.routers.web-asap.middlewares=web-asap
-      - traefik.http.routers.web-asap.rule=(Host(`api.myiot.com`) && (PathPrefix(`/asap/`) || PathPrefix(`/asap`)))
-      - traefik.http.routers.web-asap.service=web-asap
-      - traefik.http.routers.web-asap.tls.certresolver=leresolver
-      - traefik.http.routers.web-asap.tls=true
-      - traefik.http.services.web-asap.loadbalancer.server.port=8080
+      - traefik.http.routers.web-landing.entrypoints=websecure
+      - traefik.http.routers.web-landing.rule=Host(`myiot.com`)
+      - traefik.http.routers.web-landing.service=web-landing
+      - traefik.http.routers.web-landing.tls.certresolver=leresolver
+      - traefik.http.routers.web-landing.tls=true
+      - traefik.http.services.web-landing.loadbalancer.server.port=8080
 
-  api-control:
+  api-sensor:
     image: python:3.10.6-slim-bullseye
-    container_name: api-control
-    hostname: api-control
+    container_name: api-sensor
+    hostname: api-sensor
     volumes:
-      - ./services/control:/usr/src/app
+      - ./services/sensor:/usr/src/app
     environment:
       DB_HOSTNAME: mongodb
       DB_PORT: 27017
@@ -167,15 +159,15 @@ services:
     command: /bin/bash -c "pip3 install -r requirements.txt && python app.py"
     labels:
       - traefik.enable=true
-      - traefik.http.middlewares.web-control.stripprefix.forceslash=false
-      - traefik.http.middlewares.web-control.stripprefix.prefixes=/control/,/control
-      - traefik.http.routers.web-control.entrypoints=websecure
-      - traefik.http.routers.web-control.middlewares=web-control
-      - traefik.http.routers.web-control.rule=(Host(`api.myiot.com`) && (PathPrefix(`/control/`) || PathPrefix(`/control`)))
-      - traefik.http.routers.web-control.service=web-control
-      - traefik.http.routers.web-control.tls.certresolver=leresolver
-      - traefik.http.routers.web-control.tls=true
-      - traefik.http.services.web-control.loadbalancer.server.port=8080
+      - traefik.http.middlewares.web-sensor.stripprefix.forceslash=false
+      - traefik.http.middlewares.web-sensor.stripprefix.prefixes=/sensor/,/sensor
+      - traefik.http.routers.web-sensor.entrypoints=websecure
+      - traefik.http.routers.web-sensor.middlewares=web-sensor
+      - traefik.http.routers.web-sensor.rule=(Host(`api.myiot.com`) && (PathPrefix(`/sensor/`) || PathPrefix(`/sensor`)))
+      - traefik.http.routers.web-sensor.service=web-sensor
+      - traefik.http.routers.web-sensor.tls.certresolver=leresolver
+      - traefik.http.routers.web-sensor.tls=true
+      - traefik.http.services.web-sensor.loadbalancer.server.port=8080
 
   # ===============
   # DB Tester
