@@ -5,8 +5,10 @@ from bson.json_util import dumps, loads
 from bson import ObjectId
 from datetime import timezone, datetime, timedelta
 import os
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
 # Get environment variables
 DB_HOSTNAME = os.getenv('DB_HOSTNAME', default='127.0.0.1')
@@ -23,7 +25,12 @@ mydb = myclient[DB_NAME]
 
 @app.route('/')
 def index():
-    return 'Selamat Datang di API'
+    return 'Selamat Datang di API Sensor'
+
+
+@app.route('/countAll')
+def countSensorAll():
+    return jsonify({"count": 1})
 
 
 # ===============
