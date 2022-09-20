@@ -30,16 +30,21 @@ def index():
 
 @app.route('/countAll')
 def countSensorAll():
-    return jsonify({"count": 1})
+    mycol = mydb["devices"]
+    myquery = {"type": "sensor"}
+    mydoc = mycol.find(myquery, projection={"data": False, "_id": False})
+    json_data = dumps(list(mydoc), indent=2)
+    print(json_data)
+    return jsonify({"count": len(json_data)})
 
 
 # ===============
 # CRUD Device
 # ===============
-@app.route('/devices/getAll')
+@app.route('/getAll')
 def getDevicesAll():
     mycol = mydb["devices"]
-    myquery = {"jenis": "sensor_asap"}
+    myquery = {"jenis.tipe": "sensor"}
     mydoc = mycol.find(myquery, projection={"data": False, "_id": False})
     json_data = dumps(list(mydoc), indent=2)
     print(json_data)
