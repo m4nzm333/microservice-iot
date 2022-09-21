@@ -1,7 +1,7 @@
 /**
- *  Id      : suhu1
+ *  Id      : suhu1, kelembapan1
  *  Tipe    : sensor
- *  Model   : suhu
+ *  Model   : suhu, kelembapan
  */
 
 // DHT Library
