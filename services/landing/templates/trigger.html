@@ -3,7 +3,7 @@
 
 <head>
     <title>Trigger | My Smarthome</title>
-    
+
     {% include('includes/head.html') %}
 </head>
 
@@ -14,33 +14,56 @@
             <div id="content">
                 {% include('includes/topbar.html') %}
                 <div class="container-fluid">
-                    <h1 class="h3 mb-4 text-gray-800">Sensor</h1>
+                    <h1 class="h3 mb-4 text-gray-800">Trigger</h1>
                     <div class="row">
                         <dir class="col-12">
                             <div class="card shadow">
-                                <div class="card-body ">
+                                <div class="card-body table-responsive">
                                     <table id="tableSensor" class="table table-striped">
                                         <thead>
                                             <tr>
-                                                <th>Nama Sensor</th>
-                                                <th>Jenis</th>
+                                                <th>Nama Trigger</th>
+                                                <th>Sensor</th>
                                                 <th>Nilai</th>
                                                 <th>Terakhir Berubah</th>
+                                                <th>Nama Control</th>
+                                                <th>Set Status</th>
                                                 <th>Aksi</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             <tr>
-                                                <td>Sensor A</td>
-                                                <td>Suhu</td>
-                                                <td>20</td>
+                                                <td>Kipas menyala jika panas</td>
+                                                <td>Suhu Ruang Tengah</td>
+                                                <td>34</td>
                                                 <td>2022-02-20 20:20:20</td>
+                                                <td>Kipas Ruang Tengah</td>
+                                                <td>1</td>
                                                 <td>
                                                     <button class="btn btn-sm btn-primary">
                                                         <i class="fa fa-edit"></i>
                                                     </button>
                                                     <button class="btn btn-sm btn-info">
-                                                        <i class="fa fa-chart-line"></i>
+                                                        <i class="fa fa-clock"></i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-danger">
+                                                        <i class="fa fa-trash"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>Kipas menyala jika dingin</td>
+                                                <td>Suhu Ruang Tengah</td>
+                                                <td>29</td>
+                                                <td>2022-09-21 12:45:23</td>
+                                                <td>Kipas Ruang Tengah</td>
+                                                <td>0</td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-primary">
+                                                        <i class="fa fa-edit"></i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-info">
+                                                        <i class="fa fa-clock"></i>
                                                     </button>
                                                     <button class="btn btn-sm btn-danger">
                                                         <i class="fa fa-trash"></i>
