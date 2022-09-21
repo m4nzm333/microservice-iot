@@ -3,7 +3,7 @@
 
 <head>
     <title>Scheduler | My Smarthome</title>
-    
+
     {% include('includes/head.html') %}
 </head>
 
@@ -25,9 +25,8 @@
                                                 <th>Nama Jadwal</th>
                                                 <th>Jenis Jadwal</th>
                                                 <th>Mulai</th>
-                                                <th>Selesai</th>
-                                                <th>Durasi</th>
                                                 <th>Nama Kontrol</th>
+                                                <th>Set Status</th>
                                                 <th>Aksi</th>
                                             </tr>
                                         </thead>
@@ -36,9 +35,8 @@
                                                 <td>Lampu Menyala Malam</td>
                                                 <td>Harian</td>
                                                 <td>17:30</td>
-                                                <td>06:00</td>
-                                                <td>12 Jam 30 Menit</td>
                                                 <td>Lampu A</td>
+                                                <td>1</td>
                                                 <td>
                                                     <button class="btn btn-sm btn-primary">
                                                         <i class="fa fa-edit"></i>
@@ -52,12 +50,53 @@
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td>Pompa PAMS</td>
+                                                <td>Lampu Mati Pagi</td>
+                                                <td>Harian</td>
+                                                <td>06:00</td>
+                                                <td>Lampu A</td>
+                                                <td>0</td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-primary">
+                                                        <i class="fa fa-edit"></i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-info">
+                                                        <i class="fa fa-chart-line"></i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-danger">
+                                                        <i class="fa fa-trash"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>Pompa Air</td>
                                                 <td>Mingguan</td>
-                                                <td>Senin, 15.00 - 15.15</td>
-                                                <td>Jumat, 15.00 - 15.15</td>
-                                                <td>15 Menit</td>
+                                                <td>
+                                                    Hari Senin <br>
+                                                    Jam 06.00
+                                                </td>
                                                 <td>Pompa Air PDAM</td>
+                                                <td>1</td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-primary">
+                                                        <i class="fa fa-edit"></i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-info">
+                                                        <i class="fa fa-chart-line"></i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-danger">
+                                                        <i class="fa fa-trash"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>Pompa Air</td>
+                                                <td>Mingguan</td>
+                                                <td>
+                                                    Hari Senin <br>
+                                                    Jam 06.30
+                                                </td>
+                                                <td>Pompa Air PDAM</td>
+                                                <td>0</td>
                                                 <td>
                                                     <button class="btn btn-sm btn-primary">
                                                         <i class="fa fa-edit"></i>
