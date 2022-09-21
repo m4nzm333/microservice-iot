@@ -78,10 +78,9 @@
                         data: "nama",
                         render: function (data, type, row) {
                             if (row.last_data.value)
-                                return moment(Date(row.last_data.ts.$date)).format('YYYY-MM-DD HH:mm:ss');
+                                return moment(row.last_data.ts.$date).format('YYYY-MM-DD HH:mm:ss');
                             else
                                 return 'No Data';
-                            return 'XX';
                         }
                     },
                     {
