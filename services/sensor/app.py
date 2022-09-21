@@ -51,12 +51,12 @@ def getDevicesAll():
     return jsonify(json.loads(json_data))
 
 
-@app.route('/devices/getById')
+@app.route('/getById')
 def getDevicessById():
     idDevice = request.args.get('id')
     mycol = mydb["devices"]
     myquery = {
-        "jenis": "sensor_asap",
+        "jenis.tipe": "sensor",
         "id": idDevice
     }
     mydoc = mycol.find(myquery, projection={"data": False, "_id": False})
@@ -122,12 +122,13 @@ def deleteDeviceById():
 # ===============
 # Data
 # ===============
-@app.route('/data/insert', methods=['POST'])
+@app.route('/insertData', methods=['POST'])
 def insertData():
     idDevice = request.form.get('id')
     value = request.form.get('value')
+    model = request.form.get('model')
     if idDevice:
-        mycol = mydb["asap"]
+        mycol = mydb[model]
         mycol.insert_one({
             '_id': ObjectId(),
             'value': value,

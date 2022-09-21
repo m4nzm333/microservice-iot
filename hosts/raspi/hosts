@@ -1,0 +1,14 @@
+127.0.0.1	localhost
+::1		localhost ip6-localhost ip6-loopback
+ff02::1		ip6-allnodes
+ff02::2		ip6-allrouters
+
+127.0.1.1	mybasestation1
+
+192.168.137.1 myiot.com
+192.168.137.1 traefik.myiot.com
+192.168.137.1 whoami.myiot.com
+192.168.137.1 api.myiot.com
+192.168.137.1 portainer.myiot.com
+192.168.137.1 db.myiot.com
+192.168.137.1 api.myiot.com
