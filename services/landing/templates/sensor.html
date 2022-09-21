@@ -19,6 +19,10 @@
                         <dir class="col-12">
                             <div class="card shadow">
                                 <div class="card-body table-responsive p-3">
+                                    <button class="btn btn-primary" id="btnTambah">
+                                        <i class="fa fa-plus"></i> Tambah Sensor
+                                    </button>
+                                    <hr>
                                     <table id="tableSensor" class="table table-striped table-bordered">
                                         <thead>
                                             <tr>
@@ -46,6 +50,52 @@
     {% include('includes/scrollup.html') %}
     {% include('includes/script.html') %}
 
+    <div class="modal fade" id="modalSensor" tabindex="-1" role="dialog" aria-labelledby="modalSesorLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <form action="" method="post">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modalSesorLabel">Tambah Sensor</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="container">
+                            <div class="form-group row">
+                                <label for="nama" class="col-4">Nama Sensor</label>
+                                <div class="col-8">
+                                    <input type="text" name="nama" id="nama" class="form-control" placeholder="Nama Sensor">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="nama" class="col-4">Tipe</label>
+                                <div class="col-8">
+                                    <select name="tipe" id="tipe" class="form-control">
+                                        <option value="cahaya">Cahaya</option>
+                                        <option value="suhu">Suhu</option>
+                                        <option value="kelembapan">Kelembapan</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="nama" class="col-4">Satuan</label>
+                                <div class="col-8">
+                                    <input type="text" name="satuan" id="satuan" class="form-control" placeholder="Satuan">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Kembali</button>
+                        <button type="button" class="btn btn-success">
+                            <i class="fa fa-save"></i> Simpan
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
     <script defer>
         var baseApiURL = 'http://api.myiot.com';
@@ -103,6 +153,10 @@
         }
 
         initDatatable();
+
+        $("#btnTambah").click(() => {
+            $("#modalSensor").modal('show');
+        })
 
     </script>
 
