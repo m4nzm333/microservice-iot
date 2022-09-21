@@ -32,23 +32,25 @@ def on_message(client, userdata, message):
                 tipe = topicArray[2]
                 model = topicArray[3]
                 idAlat = topicArray[4]
-                print(tipe)
 
-                # Ambil data perangkat dari database dan cek jika exist
-                respond = requests.get(apiUrl + "/sensor/getById?",
-                                       params={"id": idAlat}, verify=False).json()
-                # Cek jika perangkat terdaftar
-                if respond == []:
-                    # Tambahkan perangkat ke database
-                    print("Devices : Perangkat Tidak Ditemukan")
+                # Jika tipe adalah sensor
+                if tipe == 'sensor': 
 
-                # Simpan data ke database
-                requests.post(apiUrl + "/sensor/insertData",
-                              data={
-                                  "id": idAlat,
-                                  "value": payload,
-                                  "model": model
-                              }, verify=False)
+                    # Ambil data perangkat dari database dan cek jika exist
+                    respond = requests.get(apiUrl + "/sensor/getById?",
+                                        params={"id": idAlat}, verify=False).json()
+                    # Cek jika perangkat terdaftar
+                    if respond == []:
+                        # TODO: Tambahkan perangkat ke database
+                        print("Devices : Perangkat Tidak Ditemukan")
+
+                    # Simpan data ke database
+                    requests.post(apiUrl + "/sensor/insertData",
+                                data={
+                                    "id": idAlat,
+                                    "value": payload,
+                                    "model": model
+                                }, verify=False)
 
     sensorDataLast[topic] = payload
 
