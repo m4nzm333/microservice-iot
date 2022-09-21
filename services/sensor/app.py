@@ -47,8 +47,19 @@ def getDevicesAll():
     myquery = {"jenis.tipe": "sensor"}
     mydoc = mycol.find(myquery, projection={"data": False, "_id": False})
     json_data = dumps(list(mydoc), indent=2)
-    print(json_data)
-    return jsonify(json.loads(json_data))
+    dataReturn = []
+    for device in json.loads(json_data):
+        print(device['jenis']['model'])
+        myquery = {"idDevice": device['id']}
+        mycol = mydb[device['jenis']['model']]
+        mydoc = mycol.find(myquery, projection={"data": False, "_id": False}).sort("ts", -1)
+        lists = json.loads(dumps(list(mydoc)))
+        if lists == []:
+            device['last_data'] = []
+        else:
+            device['last_data'] = lists[0]
+        dataReturn.append(device)
+    return jsonify(dataReturn)
 
 
 @app.route('/getById')
@@ -174,5 +185,9 @@ def getByDate():
     except:
         return jsonify([])
 
+
+@app.route('/getLastById')
+def getLastById():
+    return jsonify([])
 
 app.run(host='0.0.0.0', port=8080, debug=True)

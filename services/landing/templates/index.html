@@ -56,12 +56,19 @@
     {% include('includes/script.html') %}
 
     <script defer>
-        var baseApiURL = 'https://api.myiot.com';
+        var baseApiURL = 'http://api.myiot.com';
 
         $.ajax({
             url: `${baseApiURL}/sensor/countAll`,
             success: respond => {
                 $("#jumlahSensor").text(respond.count);
+            }
+        })
+
+        $.ajax({
+            url: `${baseApiURL}/control/countAll`,
+            success: respond => {
+                $("#jumlahKontrol").text(respond.count);
             }
         })
 

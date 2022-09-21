@@ -10,14 +10,7 @@ services:
     hostname: traefik
     command:
       - --api
-      - --certificatesresolvers.leresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory
-      - --certificatesresolvers.leresolver.acme.email=mr.unlistedi@gmail.com #Set your email address here, is for the generation of SSL certificates with Let's Encrypt. 
-      - --certificatesresolvers.leresolver.acme.httpchallenge.entrypoint=web
-      - --certificatesresolvers.leresolver.acme.httpchallenge=true
-      - --certificatesresolvers.leresolver.acme.storage=./acme.json
-      - --certificatesresolvers.leresolver.acme.tlschallenge=true
       - --entrypoints.web.address=:80
-      - --entrypoints.websecure.address=:443
       - --log.level=ERROR
       - --providers.docker
     ports:
@@ -30,16 +23,9 @@ services:
       - TZ=Asia/Makassar
     labels:
       - traefik.enable=true
-      - traefik.http.routers.traefik.entrypoints=websecure
+      - traefik.http.routers.traefik.entrypoints=web
       - traefik.http.routers.traefik.rule=Host(`traefik.myiot.com`)
       - traefik.http.routers.traefik.service=api@internal
-      - traefik.http.routers.traefik.tls.certresolver=leresolver
-      - traefik.http.routers.traefik.tls=true
-      # Redirect HTTP -> HTTPS
-      - traefik.http.routers.http-catchall.rule=hostregexp(`{host:.+}`)
-      - traefik.http.routers.http-catchall.entrypoints=web
-      - traefik.http.routers.http-catchall.middlewares=redirect-to-https
-      - traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https
     networks:
       - services-proxy
       - services-db
@@ -57,11 +43,9 @@ services:
       - ./portainer/data:/data
     labels:
       - traefik.enable=true
-      - traefik.http.routers.portainer.entrypoints=websecure
+      - traefik.http.routers.portainer.entrypoints=web
       - traefik.http.routers.portainer.rule=Host(`portainer.myiot.com`)
       - traefik.http.routers.portainer.service=portainer
-      - traefik.http.routers.portainer.tls.certresolver=leresolver
-      - traefik.http.routers.portainer.tls=true
       - traefik.http.services.portainer.loadbalancer.server.port=9000
     environment:
       - TZ=Asia/Makassar
@@ -105,11 +89,9 @@ services:
       - services-proxy
     labels:
       - traefik.enable=true
-      - traefik.http.routers.mongo-express.entrypoints=websecure
+      - traefik.http.routers.mongo-express.entrypoints=web
       - traefik.http.routers.mongo-express.rule=Host(`db.myiot.com`)
       - traefik.http.routers.mongo-express.service=mongo-express
-      - traefik.http.routers.mongo-express.tls.certresolver=leresolver
-      - traefik.http.routers.mongo-express.tls=true
       - traefik.http.services.mongo-express.loadbalancer.server.port=8081
     depends_on:
       - mongodb
@@ -132,11 +114,9 @@ services:
     command: /bin/bash -c "pip3 install -r requirements.txt && python app.py"
     labels:
       - traefik.enable=true
-      - traefik.http.routers.web-landing.entrypoints=websecure
+      - traefik.http.routers.web-landing.entrypoints=web
       - traefik.http.routers.web-landing.rule=Host(`myiot.com`)
       - traefik.http.routers.web-landing.service=web-landing
-      - traefik.http.routers.web-landing.tls.certresolver=leresolver
-      - traefik.http.routers.web-landing.tls=true
       - traefik.http.services.web-landing.loadbalancer.server.port=8080
 
   api-sensor:
@@ -161,12 +141,10 @@ services:
       - traefik.enable=true
       - traefik.http.middlewares.web-sensor.stripprefix.forceslash=false
       - traefik.http.middlewares.web-sensor.stripprefix.prefixes=/sensor/,/sensor
-      - traefik.http.routers.web-sensor.entrypoints=websecure
+      - traefik.http.routers.web-sensor.entrypoints=web
       - traefik.http.routers.web-sensor.middlewares=web-sensor
       - traefik.http.routers.web-sensor.rule=(Host(`api.myiot.com`) && (PathPrefix(`/sensor/`) || PathPrefix(`/sensor`)))
       - traefik.http.routers.web-sensor.service=web-sensor
-      - traefik.http.routers.web-sensor.tls.certresolver=leresolver
-      - traefik.http.routers.web-sensor.tls=true
       - traefik.http.services.web-sensor.loadbalancer.server.port=8080
 
   api-control:
@@ -191,12 +169,10 @@ services:
       - traefik.enable=true
       - traefik.http.middlewares.api-control.stripprefix.forceslash=false
       - traefik.http.middlewares.api-control.stripprefix.prefixes=/control/,/control
-      - traefik.http.routers.api-control.entrypoints=websecure
+      - traefik.http.routers.api-control.entrypoints=web
       - traefik.http.routers.api-control.middlewares=api-control
       - traefik.http.routers.api-control.rule=(Host(`api.myiot.com`) && (PathPrefix(`/control/`) || PathPrefix(`/control`)))
       - traefik.http.routers.api-control.service=api-control
-      - traefik.http.routers.api-control.tls.certresolver=leresolver
-      - traefik.http.routers.api-control.tls=true
       - traefik.http.services.api-control.loadbalancer.server.port=8080
 
   # ===============
