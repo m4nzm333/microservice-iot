@@ -68,10 +68,9 @@ void loop()
     float newT = dht.readTemperature();
     if (!isnan(newT))
     {
-
         Serial.println(newT);
         client.publish(topic, String(newT).c_str(), true);
     }
     client.loop();
-    delay(1000);
+    delay(5000);
 }
