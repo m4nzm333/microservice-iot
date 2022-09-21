@@ -169,24 +169,52 @@ services:
       - traefik.http.routers.web-sensor.tls=true
       - traefik.http.services.web-sensor.loadbalancer.server.port=8080
 
-  # ===============
-  # DB Tester
-  # ===============
-  whoami:
-    image: traefik/whoami
-    container_name: whoami
+  api-control:
+    image: python:3.10.6-slim-bullseye
+    container_name: api-control
+    hostname: api-control
+    volumes:
+      - ./services/control:/usr/src/app
     environment:
+      DB_HOSTNAME: mongodb
+      DB_PORT: 27017
+      DB_USERNAME: root
+      DB_PASSWORD: 123456
+      DB_NAME: myiot
       TZ: Asia/Makassar
+    networks:
+      - services-db
+      - services-proxy
+    working_dir: /usr/src/app
+    command: /bin/bash -c "pip3 install -r requirements.txt && python app.py"
     labels:
       - traefik.enable=true
-      - traefik.http.routers.whoami.entrypoints=websecure
-      - traefik.http.routers.whoami.rule=(Host(`myiot.com`) && Path(`/whoami`))
-      - traefik.http.routers.whoami.service=whoami
-      - traefik.http.routers.whoami.tls.certresolver=leresolver
-      - traefik.http.routers.whoami.tls=true
-      - traefik.http.services.whoami.loadbalancer.server.port=80
+      - traefik.http.middlewares.api-control.stripprefix.forceslash=false
+      - traefik.http.middlewares.api-control.stripprefix.prefixes=/control/,/control
+      - traefik.http.routers.api-control.entrypoints=websecure
+      - traefik.http.routers.api-control.middlewares=api-control
+      - traefik.http.routers.api-control.rule=(Host(`api.myiot.com`) && (PathPrefix(`/control/`) || PathPrefix(`/control`)))
+      - traefik.http.routers.api-control.service=api-control
+      - traefik.http.routers.api-control.tls.certresolver=leresolver
+      - traefik.http.routers.api-control.tls=true
+      - traefik.http.services.api-control.loadbalancer.server.port=8080
+
+  # ===============
+  # Scheduler
+  # ===============
+  scheduler:
+    image: python:3.10.6-slim-bullseye
+    container_name: scheduler
+    hostname: scheduler
+    restart: always
+    volumes:
+      - ./services/scheduler:/usr/src/app
+    working_dir: /usr/src/app
+    command: /bin/bash -c "pip3 install -r requirements.txt && python app.py"
+    environment:
+      TZ: Asia/Makassar
     networks:
-      - services-proxy
+      - services-db
 
 networks:
   services-proxy:
