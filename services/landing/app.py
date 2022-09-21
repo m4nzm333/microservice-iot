@@ -6,7 +6,11 @@ app = Flask(__name__)
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('login.html')
+
+@app.route('/dashboard', methods = ['POST', 'GET'])
+def dashboard():
+    return render_template('dashboard.html')
 
 
 @app.route('/sensor')
