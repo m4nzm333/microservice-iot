@@ -52,7 +52,8 @@ def getDevicesAll():
         print(device['jenis']['model'])
         myquery = {"idDevice": device['id']}
         mycol = mydb[device['jenis']['model']]
-        mydoc = mycol.find(myquery, projection={"data": False, "_id": False}).sort("ts", -1)
+        mydoc = mycol.find(myquery, projection={
+                           "data": False, "_id": False}).sort("ts", -1)
         lists = json.loads(dumps(list(mydoc)))
         if lists == []:
             device['last_data'] = []
@@ -151,6 +152,43 @@ def insertData():
         return 'id missing'
 
 
+@app.route('/getDataByDevice')
+def getDataByDevice():
+    try:
+        idDevice = request.args.get('id')
+
+        mycol = mydb["devices"]
+        myquery = {
+            "jenis.tipe": "sensor",
+            "id": idDevice
+        }
+        mydoc = mycol.find(myquery, projection={"data": False, "_id": False})
+        rowData = list(mydoc)
+        if len(rowData) != 0:
+            model = rowData[0]['jenis']['model']
+            mycol = mydb[model]
+            myquery = {
+                "idDevice": idDevice,
+            }
+            mydoc = mycol.find(myquery, projection={"_id": False})
+            mydata = list(mydoc)
+            returnData = []
+            for i in mydata:
+                returnData.append({
+                    'value': i.get('value'),
+                    'ts': (i.get('ts') + timedelta(hours=+8)).strftime('%Y-%m-%d %H:%M:%S')
+                })
+                print(returnData)
+            
+            
+
+            return jsonify(returnData)
+        else:
+            return jsonify(returnData)
+    except:
+        return jsonify([])
+
+
 @app.route('/data/getByDate')
 def getByDate():
     try:
@@ -189,5 +227,6 @@ def getByDate():
 @app.route('/getLastById')
 def getLastById():
     return jsonify([])
+
 
 app.run(host='0.0.0.0', port=8080, debug=True)
