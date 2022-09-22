@@ -72,7 +72,7 @@ def on_connect(client, userdata, flags, rc):
 
 
 # Memulai koneksi
-client = mqtt.Client(client_id="server-grab")
+client = mqtt.Client(client_id="raspi-subscriber")
 client.username_pw_set(username="putra", password="123456")
 
 client.on_message = on_message
