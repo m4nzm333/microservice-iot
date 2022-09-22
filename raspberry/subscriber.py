@@ -1,7 +1,6 @@
 """
     Ini adalah program untuk mengambil semua data dari topic MQTT Sensor 
     dengan cara subscribe kemudian mengirim data ke server menggunakna HTTP
-    BUG: Masih sering keluar sendiri meskipun sudah dikasih loop, kemungkinan karena library paho-mqtt
 """
 import paho.mqtt.client as mqtt
 import time
@@ -67,6 +66,7 @@ def on_message(client, userdata, message):
 def on_connect(client, userdata, flags, rc):
     if rc == 0:
         print("Connected to MQTT Broker!")
+        client.subscribe("#")
     else:
         print("Failed to connect, return code %d\n", rc)
 
@@ -80,9 +80,4 @@ client.on_connect = on_connect
 
 client.connect(host="192.168.100.1", port=1883)
 
-client.loop_start()
-
-client.subscribe("#")
-time.sleep(30)
-
-client.loop_stop()
+client.loop_forever()
