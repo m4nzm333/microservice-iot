@@ -81,16 +81,21 @@ def getDevicessById():
         return jsonify([])
 
 
-@app.route('/devices/insert', methods=['POST'])
+@app.route('/insertDevice', methods=['POST'])
 def insertDevices():
     idDevice = request.form.get('id')
-    jenis = 'sensor_asap'
-    nama = request.form.get('nama')
-    rumah = request.form.get('rumah')
+    nama = request.form.get('nama', idDevice)
+    model = request.form.get('model')
+    satuan = request.form.get('satuan', default='satuan')
+    rumah = request.form.get('rumah', default='rumahku')
 
     mydict = {
         "id": idDevice,
-        "jenis": jenis,
+        "jenis": {
+            "tipe": 'sensor',
+            "model": model,
+            "satuan": satuan
+        },
         "nama": nama,
         "rumah": rumah
     }
