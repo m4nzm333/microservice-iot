@@ -179,9 +179,50 @@ def getDataByDevice():
                     'ts': (i.get('ts') + timedelta(hours=+8)).strftime('%Y-%m-%d %H:%M:%S')
                 })
                 print(returnData)
-            
-            
+            return jsonify(returnData)
+        else:
+            return jsonify(returnData)
+    except:
+        return jsonify([])
 
+
+@app.route('/getDataByDeviceDate')
+def getDataByDeviceDate():
+    try:
+        idDevice = request.args.get('id')
+        date = request.args.get(
+            'date', default=datetime.now().strftime("%Y-%m-%d"))
+        dateStartObj = datetime.strptime(
+            date + " 00:00:00", "%Y-%m-%d %H:%M:%S") - timedelta(hours=8)
+        dateEndObj = datetime.strptime(
+            date + " 23:59:59", "%Y-%m-%d %H:%M:%S") - timedelta(hours=8)
+
+        mycol = mydb["devices"]
+        myquery = {
+            "jenis.tipe": "sensor",
+            "id": idDevice
+        }
+        mydoc = mycol.find(myquery, projection={"data": False, "_id": False})
+        rowData = list(mydoc)
+        if len(rowData) != 0:
+            model = rowData[0]['jenis']['model']
+            mycol = mydb[model]
+            myquery = {
+                "idDevice": idDevice,
+                'ts': {
+                    '$gte': dateStartObj,
+                    '$lte': dateEndObj
+                }
+            }
+            mydoc = mycol.find(myquery, projection={"_id": False})
+            mydata = list(mydoc)
+            returnData = []
+            for i in mydata:
+                returnData.append({
+                    'value': i.get('value'),
+                    'ts': (i.get('ts') + timedelta(hours=+8)).strftime('%Y-%m-%d %H:%M:%S')
+                })
+                print(returnData)
             return jsonify(returnData)
         else:
             return jsonify(returnData)

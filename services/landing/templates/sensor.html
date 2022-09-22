@@ -107,6 +107,19 @@
                     </button>
                 </div>
                 <div class="modal-body">
+                    <form id="formFilterTanggal" action="#" method="post">
+                        <div class="form-group row">
+                            <label for="tanggal" class="col-4 col-md-2">Tanggal</label>
+                            <div class="col-6">
+                                <input type="text" class="form-control" id="tanggal" name="tanggal" placeholder="Tanggal Suhu">
+                            </div>
+                            <div class="col-3">
+                                <button class="btn btn-outline-primary">
+                                    <i class="fa fa-filter"></i> Terapkan
+                                </button>
+                            </div>
+                        </div>
+                    </form>
                     <canvas id="grafik" style="width:100%;max-height:600px"></canvas>
                 </div>
                 <div class="modal-footer">
@@ -119,7 +132,15 @@
     <script defer>
         var baseApiURL = 'http://api.myiot.com';
 
+        $("#tanggal").datepicker({
+            format: "yyyy-mm-dd",
+            language: "id",
+            todayBtn: "linked",
+            todayHighlight: true
+        });
+
         const ctx = document.getElementById('grafik').getContext('2d');
+        var myChart;
 
         async function initDatatable() {
             var respond = await $.ajax({ url: `${baseApiURL}/sensor/getAll` });
@@ -157,13 +178,13 @@
                     {
                         data: "id",
                         render: function (data, type, row) {
-                            return `<button class="btn btn-sm btn-primary" data-id="${data}">
+                            return `<button class="btn btn-sm btn-primary" data-id="${data} data-nama="${row.nama}">
                                     <i class="fa fa-edit"></i>
                                 </button>
-                                <button class="btn btn-sm btn-info btnGraph" data-id="${data}">
+                                <button class="btn btn-sm btn-info btnGraph" data-id="${data}" data-nama="${row.nama}">
                                     <i class="fa fa-chart-line"></i>
                                 </button>
-                                <button class="btn btn-sm btn-danger" data-id="${data}">
+                                <button class="btn btn-sm btn-danger" data-id="${data}" data-nama="${row.nama}">
                                     <i class="fa fa-trash"></i>
                                 </button>`;
                         },
@@ -171,10 +192,17 @@
                 ],
                 drawCallback: () => {
                     // TODO: Bikin dinamis
-                    $(".btnGraph").click(async () => {
+                    $(".btnGraph").click(async function () {
                         $("#modalHistory").modal('show');
+                        var idAlat = $(this).data('id');
+                        var nama = $(this).data('nama');
+                        // Set form data
+                        $("#formFilterTanggal").data('id', idAlat)
+                        $("#formFilterTanggal").data('nama', nama)
+
+                        $("#modalHistoryLabel").text(`Data ${nama}`);
                         var respond = await $.ajax({
-                            url: `${baseApiURL}/sensor/getDataByDevice?id=suhu1`
+                            url: `${baseApiURL}/sensor/getDataByDeviceDate?id=${idAlat}`
                         });
                         dataChart = [];
                         respond.forEach(function (el) {
@@ -184,27 +212,23 @@
                             })
                         })
 
-                        console.log(respond)
-
-                        var myChart = new Chart(ctx, {
+                        if (myChart) myChart.destroy()
+                        myChart = new Chart(ctx, {
                             type: 'line',
                             data: {
-                                labels: [],
-                                datasets: [{
-                                    data: dataChart,
-                                    label: "Sensor Suhu",
-                                    borderColor: "#3e95cd",
-                                    fill: false
-                                }]
+                                datasets: [
+                                    {
+                                        data: dataChart,
+                                        label: nama,
+                                        borderColor: "#3e95cd",
+                                        fill: false
+                                    }
+                                ]
                             },
                             options: {
                                 scales: {
-                                    xAxes: [{
+                                    x: {
                                         type: 'time',
-                                        distribution: 'linear',
-                                    }],
-                                    title: {
-                                        display: false,
                                     }
                                 }
                             }
@@ -218,8 +242,50 @@
 
         $("#btnTambah").click(() => {
             $("#modalSensor").modal('show');
-        })
+        });
 
+        $("#formFilterTanggal").submit(async function (e) {
+            e.preventDefault();
+            var idAlat = $(this).data('id');
+            var nama = $(this).data('nama');
+            var respond = await $.ajax({
+                url: `${baseApiURL}/sensor/getDataByDeviceDate`,
+                data: {
+                    id: idAlat,
+                    date: $("#tanggal").val()
+                }
+            });
+            dataChart = [];
+            respond.forEach(function (el) {
+                dataChart.push({
+                    x: el.ts,
+                    y: el.value
+                })
+            })
+
+            if (myChart) myChart.destroy()
+            myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    datasets: [
+                        {
+                            data: dataChart,
+                            label: nama,
+                            borderColor: "#3e95cd",
+                            fill: false
+                        }
+                    ]
+                },
+                options: {
+                    scales: {
+                        x: {
+                            type: 'time',
+                        }
+                    }
+                }
+            });
+
+        })
     </script>
 
 </body>
