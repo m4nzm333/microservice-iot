@@ -94,5 +94,5 @@ void loop()
     }
 
     client.loop();
-    delay(5000);
+    delay(10000);
 }
