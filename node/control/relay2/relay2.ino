@@ -16,7 +16,7 @@ PubSubClient client(espClient);
 // Identitas Perangkat
 const char *rumah = "rumahku";
 const char *idAlatLampu = "lampu1";
-const char *model = "saklar";
+const char *model = "lampu";
 const char *tipe = "control";
 
 // Wifi
