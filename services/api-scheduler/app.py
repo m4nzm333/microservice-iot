@@ -45,8 +45,23 @@ def getDevicesAll():
     mycol = mydb["scheduler"]
     mydoc = mycol.find(projection={"_id": False})
     json_data = dumps(list(mydoc), indent=2)
-    print(json_data)
-    return jsonify(json.loads(json_data))
+    json_data = json.loads(json_data)
+    returnData = []
+    for schedule in json_data:
+        controlCol = mydb["devices"]
+        controlQuery = {
+            "jenis.tipe": "control",
+            "id": schedule['control']
+        }
+        controlDoc = controlCol.find(controlQuery, projection={"_id": False, "rumah": False, "value" : False})
+        rowData = list(controlDoc)
+        if rowData:
+            schedule['control'] = rowData[0]
+        else:
+            schedule['control'] = {}
+        returnData.append(schedule)
+
+    return jsonify(returnData)
 
 
 @app.route('/getById')

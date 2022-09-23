@@ -35,84 +35,7 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr>
-                                                <td>Lampu Menyala Malam</td>
-                                                <td>Harian</td>
-                                                <td>17:30</td>
-                                                <td>Lampu A</td>
-                                                <td>1</td>
-                                                <td>
-                                                    <button class="btn btn-sm btn-primary">
-                                                        <i class="fa fa-edit"></i>
-                                                    </button>
-                                                    <button class="btn btn-sm btn-info">
-                                                        <i class="fa fa-clock"></i>
-                                                    </button>
-                                                    <button class="btn btn-sm btn-danger">
-                                                        <i class="fa fa-trash"></i>
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>Lampu Mati Pagi</td>
-                                                <td>Harian</td>
-                                                <td>06:00</td>
-                                                <td>Lampu A</td>
-                                                <td>0</td>
-                                                <td>
-                                                    <button class="btn btn-sm btn-primary">
-                                                        <i class="fa fa-edit"></i>
-                                                    </button>
-                                                    <button class="btn btn-sm btn-info">
-                                                        <i class="fa fa-clock"></i>
-                                                    </button>
-                                                    <button class="btn btn-sm btn-danger">
-                                                        <i class="fa fa-trash"></i>
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>Pompa Air</td>
-                                                <td>Mingguan</td>
-                                                <td>
-                                                    Hari Senin <br>
-                                                    Jam 06.00
-                                                </td>
-                                                <td>Pompa Air PDAM</td>
-                                                <td>1</td>
-                                                <td>
-                                                    <button class="btn btn-sm btn-primary">
-                                                        <i class="fa fa-edit"></i>
-                                                    </button>
-                                                    <button class="btn btn-sm btn-info">
-                                                        <i class="fa fa-clock"></i>
-                                                    </button>
-                                                    <button class="btn btn-sm btn-danger">
-                                                        <i class="fa fa-trash"></i>
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>Pompa Air</td>
-                                                <td>Mingguan</td>
-                                                <td>
-                                                    Hari Senin <br>
-                                                    Jam 06.30
-                                                </td>
-                                                <td>Pompa Air PDAM</td>
-                                                <td>0</td>
-                                                <td>
-                                                    <button class="btn btn-sm btn-primary">
-                                                        <i class="fa fa-edit"></i>
-                                                    </button>
-                                                    <button class="btn btn-sm btn-info">
-                                                        <i class="fa fa-clock"></i>
-                                                    </button>
-                                                    <button class="btn btn-sm btn-danger">
-                                                        <i class="fa fa-trash"></i>
-                                                    </button>
-                                                </td>
-                                            </tr>
+
                                         </tbody>
                                     </table>
                                 </div>
@@ -199,9 +122,54 @@
 
 
     <script defer>
-        var baseApiURL = 'https://api.myiot.com';
+        var baseApiURL = 'http://api.myiot.com';
 
-        $("#tableJadwal").dataTable();
+        async function initDatatable() {
+            var respond = await $.ajax({ url: `${baseApiURL}/scheduler/getAll` });
+            console.log(respond);
+            $("#tableJadwal").dataTable({
+                data: respond,
+                columns: [
+                    { data: "nama" },
+                    {
+                        data: "jenis",
+                        render: function (data, type, row) {
+                            return data.tipe
+                        },
+                    },
+                    {
+                        data: "jenis",
+                        render: function (data, type, row) {
+                            if (data.tipe == 'harian') return data.jam
+                            else return ''
+                        },
+                    },
+                    {
+                        data: "control",
+                        render: function (data, type, row) {
+                            return data.nama;
+                        },
+                    },
+                    { data: "value" },
+                    {
+                        data: "id",
+                        render: function (data, type, row) {
+                            return `<button class="btn btn-sm btn-primary" data-id="${data} data-nama="${row.nama}">
+                                    <i class="fa fa-edit"></i>
+                                </button>
+                                <button class="btn btn-sm btn-info btnGraph" data-id="${data}" data-nama="${row.nama}">
+                                    <i class="fa fa-history"></i>
+                                </button>
+                                <button class="btn btn-sm btn-danger" data-id="${data}" data-nama="${row.nama}">
+                                    <i class="fa fa-trash"></i>
+                                </button>`;
+                        },
+                    },
+                ]
+            });
+        }
+
+        initDatatable();
 
         $("#btnTambah").click(() => {
             $("#modalJadwal").modal('show');
