@@ -51,6 +51,7 @@ void setup()
     Serial.begin(115200);
     // Pin Mode
     pinMode(PIN_LAMPU, OUTPUT);
+    digitalWrite(PIN_LAMPU, HIGH);
     // Wifi Begin
     Serial.printf("Connecting to %s \n", ssid);
     WiFi.begin(ssid, password);
