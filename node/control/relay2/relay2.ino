@@ -86,6 +86,5 @@ void setup()
 
 void loop()
 {
-    // TODO: Reconnect ke broker jika koneksi terputus
     client.loop();
 }

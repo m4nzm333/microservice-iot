@@ -16,7 +16,7 @@ PubSubClient client(espClient);
 // Identitas Perangkat
 const char *rumah = "rumahku";
 const char *idAlatKipas = "kipas1";
-const char *model = "saklar";
+const char *model = "kipas";
 const char *tipe = "control";
 
 // Wifi
@@ -29,7 +29,6 @@ const char *mqtt_username = "putra";
 const char *mqtt_password = "123456";
 const int mqtt_port = 1883;
 char topicKipas[50];
-char topicLampu[50];
 
 // Ketika terdapat pesan subscribe
 void callback(char *topic, byte *payload, unsigned int length)
@@ -39,10 +38,13 @@ void callback(char *topic, byte *payload, unsigned int length)
 
     Serial.println(topic);
     Serial.println(value);
-    if(value == 1){
-        digitalWrite(PIN_KIPAS, LOW);
-    } else {
+    if (value == 1)
+    {
         digitalWrite(PIN_KIPAS, HIGH);
+    }
+    else
+    {
+        digitalWrite(PIN_KIPAS, LOW);
     }
 }
 
@@ -52,6 +54,7 @@ void setup()
     Serial.begin(115200);
     // Pin Mode
     pinMode(PIN_KIPAS, OUTPUT);
+    digitalWrite(PIN_KIPAS, LOW);
     // Wifi Begin
     Serial.printf("Connecting to %s \n", ssid);
     WiFi.begin(ssid, password);
@@ -86,6 +89,5 @@ void setup()
 
 void loop()
 {
-    // TODO: Reconnect ke broker jika koneksi terputus
     client.loop();
 }
