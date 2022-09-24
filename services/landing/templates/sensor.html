@@ -75,7 +75,7 @@
                                 </div>
                             </div>
                             <div class="form-group row">
-                                <label for="nama" class="col-4">Rumah</label>
+                                <label for="rumah" class="col-4">Rumah</label>
                                 <div class="col-8">
                                     <select name="rumah" id="rumah" class="form-control" required>
                                         <option value="rumahku">Rumah Ku</option>
@@ -84,7 +84,7 @@
                                 </div>
                             </div>
                             <div class="form-group row">
-                                <label for="nama" class="col-4">Tipe</label>
+                                <label for="model" class="col-4">Model</label>
                                 <div class="col-8">
                                     <select name="model" id="model" class="form-control">
                                         <option value="cahaya">Cahaya</option>
@@ -94,7 +94,7 @@
                                 </div>
                             </div>
                             <div class="form-group row">
-                                <label for="nama" class="col-4">Satuan</label>
+                                <label for="satuan" class="col-4">Satuan</label>
                                 <div class="col-8">
                                     <input type="text" name="satuan" id="satuan" class="form-control" placeholder="Satuan" required>
                                 </div>
@@ -159,7 +159,6 @@
 
         async function initDatatable() {
             var respond = await $.ajax({ url: `${baseApiURL}/sensor/getAll` });
-            console.log(respond);
 
             $("#tableSensor").dataTable({
                 data: respond,
@@ -194,7 +193,7 @@
                     {
                         data: "id",
                         render: function (data, type, row) {
-                            return `<button class="btn btn-sm btn-primary" data-id="${data} data-nama="${row.nama}">
+                            return `<button class="btn btn-sm btn-primary btnEdit" data-id="${data}" data-nama="${row.nama}">
                                     <i class="fa fa-edit"></i>
                                 </button>
                                 <button class="btn btn-sm btn-info btnGraph" data-id="${data}" data-nama="${row.nama}">
@@ -253,6 +252,25 @@
                             }
                         });
                     })
+
+                    $(".btnEdit").click(async function () {
+                        var idDevice = $(this).data('id');
+                        var respond = await $.ajax({
+                            url: `${baseApiURL}/sensor/getById`,
+                            data: { id: idDevice }
+                        });
+                        $("#formSensor").trigger('reset');
+                        $("#formSensor").attr('action', `${baseApiURL}/sensor/updateById`);
+                        $("#modalSensorLabel").text(`Edit Sensor ${respond.nama}`);
+                        $("#modalSensor").modal('show');
+                        $("#id").val(idDevice);
+                        $("#id").attr('disabled', 'disabled');
+                        $("#id").addClass('disabled');
+                        $("#nama").val(respond.nama);
+                        $("#rumah").val(respond.rumah);
+                        $("#model").val(respond.jenis.model);
+                        $("#satuan").val(respond.jenis.satuan);
+                    });
                 }
             });
         }
@@ -263,21 +281,23 @@
             $("#formSensor").trigger('reset');
             $("#formSensor").attr('action', `${baseApiURL}/sensor/insertDevice`);
             $("#modalSensorLabel").text('Tambah Sensor');
+            $("#id").removeAttr('disabled');
+            $("#id").removeClass('disabled');
             $("#modalSensor").modal('show');
         });
 
-        $("#formSensor").submit(function(ev){
+        $("#formSensor").submit(function (ev) {
             $.ajax({
                 type: 'post',
                 url: $("#formSensor").attr('action'),
                 data: {
-                    'id' : $("#id").val(),
-                    'nama' : $("#nama").val(),
-                    'rumah' : $("#rumah").val(),
-                    'model' : $("#model").val(),
-                    'satuan' : $("#satuan").val(),
+                    'id': $("#id").val(),
+                    'nama': $("#nama").val(),
+                    'rumah': $("#rumah").val(),
+                    'model': $("#model").val(),
+                    'satuan': $("#satuan").val(),
                 },
-                success: function() {
+                success: function () {
                     initDatatable();
                     $("#modalSensor").modal('hide');
                 }

@@ -51,7 +51,8 @@ def getDevicesAll():
     for device in json.loads(json_data):
         myquery = {"idDevice": device['id']}
         mycol = mydb[device['jenis']['model']]
-        mydoc = mycol.find_one(myquery, projection={"_id": False}, sort=[("ts", -1)])
+        mydoc = mycol.find_one(myquery, projection={
+                               "_id": False}, sort=[("ts", -1)])
         if mydoc:
             mydoc['ts'] = (mydoc['ts'] + timedelta(hours=+8)
                            ).strftime('%Y-%m-%d %H:%M:%S')
@@ -70,12 +71,9 @@ def getDevicessById():
         "jenis.tipe": "sensor",
         "id": idDevice
     }
-    mydoc = mycol.find(myquery, projection={"data": False, "_id": False})
-    rowData = list(mydoc)
-    if rowData:
-        json_data = dumps(rowData[0], indent=2)
-        print(json_data)
-        return jsonify(json.loads(json_data))
+    mydoc = mycol.find_one(myquery, projection={"_id": False})
+    if mydoc:
+        return jsonify(mydoc)
     else:
         return jsonify([])
 
@@ -103,20 +101,27 @@ def insertDevices():
     return 'success'
 
 
-@app.route('/devices/update', methods=['POST'])
+@app.route('/updateById', methods=['POST'])
 def updateDeviceById():
     idDevice = request.form.get('id')
-    nama = request.form.get('nama')
-    rumah = request.form.get('rumah')
+    nama = request.form.get('nama', idDevice)
+    model = request.form.get('model')
+    satuan = request.form.get('satuan', default='satuan')
+    rumah = request.form.get('rumah', default='rumahku')
 
     mycol = mydb["devices"]
-    myquery = {
-        "jenis": "sensor_asap",
-        "id": idDevice
-    }
+    myquery = {"id": idDevice}
 
     if (nama):
-        newvalues = {"$set": {"nama": nama}}
+        newvalues = {"$set": {
+            "jenis": {
+                "tipe": 'sensor',
+                "model": model,
+                "satuan": satuan
+            },
+            "nama": nama,
+            "rumah": rumah
+        }}
         mycol.update_one(myquery, newvalues)
     if (rumah):
         newvalues = {"$set": {"rumah": rumah}}
