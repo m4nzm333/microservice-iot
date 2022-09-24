@@ -56,7 +56,8 @@ def getDevicesAll():
         historyReturn = historyDoc
         historyReturn["ts"] = (historyReturn.get(
             'ts') + timedelta(hours=+8)).strftime('%Y-%m-%d %H:%M:%S')
-        device['last_history'] = json.loads(json.dumps(historyDoc, indent=4, sort_keys=True, default=str))
+        device['last_history'] = json.loads(json.dumps(
+            historyDoc, indent=4, sort_keys=True, default=str))
         returnData.append(device)
     return returnData
 
@@ -132,6 +133,26 @@ def toogleControlById():
         return json_data
     else:
         return jsonify([])
+
+
+@app.route('/setValue')
+def setValueById():
+    idDevice = request.args.get('id', '')
+    trigger = request.args.get('trigger', default="manual")
+    value = request.args.get('value', default=0)
+    mycol = mydb["devices"]
+    myquery = {
+        "id": idDevice
+    }
+    mydoc = mycol.find_one(myquery, projection={"_id": False})
+    if mydoc:
+        newvalues = {"$set": {"value": value}}
+        mycol.update_one(myquery, newvalues)
+        mydoc = mycol.find_one(myquery, projection={"_id": False})
+        return dumps(mydoc)
+    else:
+        return jsonify([])
+
 
 
 app.run(host='0.0.0.0', port=8080, debug=True)
