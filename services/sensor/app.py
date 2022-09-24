@@ -49,16 +49,15 @@ def getDevicesAll():
     json_data = dumps(list(mydoc), indent=2)
     dataReturn = []
     for device in json.loads(json_data):
-        print(device['jenis']['model'])
         myquery = {"idDevice": device['id']}
         mycol = mydb[device['jenis']['model']]
-        mydoc = mycol.find(myquery, projection={
-                           "data": False, "_id": False}).sort("ts", -1)
-        lists = json.loads(dumps(list(mydoc)))
-        if lists == []:
-            device['last_data'] = []
+        mydoc = mycol.find_one(myquery, projection={"_id": False}, sort=[("ts", -1)])
+        if mydoc:
+            mydoc['ts'] = (mydoc['ts'] + timedelta(hours=+8)
+                           ).strftime('%Y-%m-%d %H:%M:%S')
+            device['last_data'] = mydoc
         else:
-            device['last_data'] = lists[0]
+            device['last_data'] = {}
         dataReturn.append(device)
     return jsonify(dataReturn)
 
