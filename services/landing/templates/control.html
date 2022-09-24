@@ -28,8 +28,6 @@
                                             <tr>
                                                 <th>Nama Sensor</th>
                                                 <th>Jenis</th>
-                                                <th>Jenis Update Terakhir</th>
-                                                <th>Waktu Update Terakhir</th>
                                                 <th>Status</th>
                                                 <th>Aksi</th>
                                             </tr>
@@ -111,9 +109,15 @@
                 columns: [
                     { data: "nama" },
                     { data: "jenis.model" },
-                    { data: "last_history.trigger" },
-                    { data: "last_history.ts" },
-                    { data: "value" },
+                    {
+                        data: "value",
+                        render: function (data, type, row) {
+                            if (data == 1)
+                                return `<button class="btn badge badge-pill badge-success toggleControl" data-id="${row.id}">Nyala</button>`;
+                            else
+                                return `<button class="btn badge badge-pill badge-danger toggleControl" data-id="${row.id}">Mati</button>`;
+                        },
+                    },
                     {
                         data: "id",
                         render: function (data, type, row) {
@@ -128,7 +132,27 @@
                                 </button>`;
                         },
                     },
-                ]
+                ],
+                drawCallback: () => {
+                    $(".toggleControl").click(async function () {
+                        var idDevice = $(this).data('id');
+                        var respond = await $.ajax({
+                            url: `${baseApiURL}/control/toggle`,
+                            data: { id: idDevice }
+                        });
+                        console.log(this)
+                        if (respond.value == 0) {
+                            console.log('trigered')
+                            $(this).removeClass('badge-danger');
+                            $(this).addClass('badge-success');
+                            $(this).text('Nyala')
+                        } else {
+                            $(this).removeClass('badge-success');
+                            $(this).addClass('badge-danger');
+                            $(this).text('Mati')
+                        }
+                    });
+                }
             });
         }
 

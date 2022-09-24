@@ -51,14 +51,13 @@ def getDevicesAll():
     for device in json_data:
         historyCol = mydb["history"]
         historyQuery = {"idDevice": device["id"]}
-        historyDoc = historyCol.find(historyQuery, projection={"_id" : False}).sort("ts", -1)
-        lists = list(historyDoc)
-        historyReturn = lists[0]
-        historyReturn["ts"] = (historyReturn.get('ts') + timedelta(hours=+8)).strftime('%Y-%m-%d %H:%M:%S')
-        device['last_history'] = lists[0]
+        historyDoc = historyCol.find_one(
+            historyQuery, projection={"_id": False}, sort=[("ts", -1)])
+        historyReturn = historyDoc
+        historyReturn["ts"] = (historyReturn.get(
+            'ts') + timedelta(hours=+8)).strftime('%Y-%m-%d %H:%M:%S')
+        device['last_history'] = json.loads(json.dumps(historyDoc, indent=4, sort_keys=True, default=str))
         returnData.append(device)
-
-    # print(json_data)
     return returnData
 
 
