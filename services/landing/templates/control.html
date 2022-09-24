@@ -28,29 +28,13 @@
                                             <tr>
                                                 <th>Nama Sensor</th>
                                                 <th>Jenis</th>
-                                                <th>Update Terakhir</th>
+                                                <th>Jenis Update Terakhir</th>
+                                                <th>Waktu Update Terakhir</th>
                                                 <th>Status</th>
                                                 <th>Aksi</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr>
-                                                <td>Lampu Ruang Tengah</td>
-                                                <td>Lampu</td>
-                                                <td>On</td>
-                                                <td>2022-02-02 20:20:20</td>
-                                                <td>
-                                                    <button class="btn btn-sm btn-primary">
-                                                        <i class="fa fa-edit"></i>
-                                                    </button>
-                                                    <button class="btn btn-sm btn-info">
-                                                        <i class="fa fa-chart-line"></i>
-                                                    </button>
-                                                    <button class="btn btn-sm btn-danger">
-                                                        <i class="fa fa-trash"></i>
-                                                    </button>
-                                                </td>
-                                            </tr>
                                         </tbody>
                                     </table>
                                 </div>
@@ -115,9 +99,41 @@
     </div>
 
     <script defer>
-        var baseApiURL = 'https://api.myiot.com';
+        var baseApiURL = 'http://api.myiot.com';
 
-        $("#tableSensor").dataTable();
+        async function initDatatable() {
+            var respond = await $.ajax({
+                url: `${baseApiURL}/control/getAll`
+            });
+            console.log(respond);
+            $("#tableSensor").dataTable({
+                data: respond,
+                columns: [
+                    { data: "nama" },
+                    { data: "jenis.model" },
+                    { data: "last_history.trigger" },
+                    { data: "last_history.ts" },
+                    { data: "value" },
+                    {
+                        data: "id",
+                        render: function (data, type, row) {
+                            return `<button class="btn btn-sm btn-primary" data-id="${data} data-nama="${row.nama}">
+                                    <i class="fa fa-edit"></i>
+                                </button>
+                                <button class="btn btn-sm btn-info btnGraph" data-id="${data}" data-nama="${row.nama}">
+                                    <i class="fa fa-history"></i>
+                                </button>
+                                <button class="btn btn-sm btn-danger" data-id="${data}" data-nama="${row.nama}">
+                                    <i class="fa fa-trash"></i>
+                                </button>`;
+                        },
+                    },
+                ]
+            });
+        }
+
+        initDatatable();
+
 
         $("#btnTambah").click(() => {
             $("#modalControl").modal('show');

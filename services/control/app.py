@@ -46,9 +46,20 @@ def getDevicesAll():
     mycol = mydb["devices"]
     myquery = {"jenis.tipe": "control"}
     mydoc = mycol.find(myquery, projection={"data": False, "_id": False})
-    json_data = dumps(list(mydoc), indent=2)
-    print(json_data)
-    return jsonify(json.loads(json_data))
+    json_data = list(mydoc)
+    returnData = []
+    for device in json_data:
+        historyCol = mydb["history"]
+        historyQuery = {"idDevice": device["id"]}
+        historyDoc = historyCol.find(historyQuery, projection={"_id" : False}).sort("ts", -1)
+        lists = list(historyDoc)
+        historyReturn = lists[0]
+        historyReturn["ts"] = (historyReturn.get('ts') + timedelta(hours=+8)).strftime('%Y-%m-%d %H:%M:%S')
+        device['last_history'] = lists[0]
+        returnData.append(device)
+
+    # print(json_data)
+    return returnData
 
 
 @app.route('/getById')
