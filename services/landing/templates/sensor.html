@@ -53,7 +53,7 @@
     <div class="modal fade" id="modalSensor" tabindex="-1" role="dialog" aria-labelledby="modalSesorLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
-                <form action="" method="post">
+                <form action="#" method="post" id="formSensor">
                     <div class="modal-header">
                         <h5 class="modal-title" id="modalSesorLabel">Tambah Sensor</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -63,9 +63,24 @@
                     <div class="modal-body">
                         <div class="container">
                             <div class="form-group row">
+                                <label for="nama" class="col-4">Id Sensor</label>
+                                <div class="col-8">
+                                    <input type="text" name="id" id="id" class="form-control" placeholder="Id Sensor" required>
+                                </div>
+                            </div>
+                            <div class="form-group row">
                                 <label for="nama" class="col-4">Nama Sensor</label>
                                 <div class="col-8">
-                                    <input type="text" name="nama" id="nama" class="form-control" placeholder="Nama Sensor">
+                                    <input type="text" name="nama" id="nama" class="form-control" placeholder="Nama Sensor" required>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="nama" class="col-4">Rumah</label>
+                                <div class="col-8">
+                                    <select name="rumah" id="rumah" class="form-control" required>
+                                        <option value="rumahku">Rumah Ku</option>
+                                        <option value="rumahTetangga">Rumah Tetangga</option>
+                                    </select>
                                 </div>
                             </div>
                             <div class="form-group row">
@@ -81,14 +96,14 @@
                             <div class="form-group row">
                                 <label for="nama" class="col-4">Satuan</label>
                                 <div class="col-8">
-                                    <input type="text" name="satuan" id="satuan" class="form-control" placeholder="Satuan">
+                                    <input type="text" name="satuan" id="satuan" class="form-control" placeholder="Satuan" required>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Kembali</button>
-                        <button type="button" class="btn btn-success">
+                        <button type="submit" class="btn btn-success">
                             <i class="fa fa-save"></i> Simpan
                         </button>
                     </div>
@@ -148,6 +163,7 @@
 
             $("#tableSensor").dataTable({
                 data: respond,
+                destroy: true,
                 columns: [
                     { data: "nama" },
                     {
@@ -244,7 +260,29 @@
         initDatatable();
 
         $("#btnTambah").click(() => {
+            $("#formSensor").trigger('reset');
+            $("#formSensor").attr('action', `${baseApiURL}/sensor/insertDevice`);
+            $("#modalSensorLabel").text('Tambah Sensor');
             $("#modalSensor").modal('show');
+        });
+
+        $("#formSensor").submit(function(ev){
+            $.ajax({
+                type: 'post',
+                url: $("#formSensor").attr('action'),
+                data: {
+                    'id' : $("#id").val(),
+                    'nama' : $("#nama").val(),
+                    'rumah' : $("#rumah").val(),
+                    'model' : $("#model").val(),
+                    'satuan' : $("#satuan").val(),
+                },
+                success: function() {
+                    initDatatable();
+                    $("#modalSensor").modal('hide');
+                }
+            })
+            ev.preventDefault();
         });
 
         $("#formFilterTanggal").submit(async function (e) {
