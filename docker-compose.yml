@@ -34,7 +34,7 @@ services:
   # Container Manager
   # ===============
   portainer:
-    image: portainer/portainer-ce:latest
+    image: portainer/portainer-ce:2.14.2
     container_name: portainer
     command: -H unix:///var/run/docker.sock
     restart: always
@@ -241,6 +241,21 @@ services:
     restart: always
     volumes:
       - ./services/scheduler:/usr/src/app
+    working_dir: /usr/src/app
+    command: /bin/bash -c "pip3 install -r requirements.txt && python app.py"
+    environment:
+      TZ: Asia/Makassar
+    networks:
+      - services-db
+      - services-proxy
+
+  trigger:
+    image: python:3.10.6-slim-bullseye
+    container_name: trigger
+    hostname: trigger
+    restart: always
+    volumes:
+      - ./services/trigger:/usr/src/app
     working_dir: /usr/src/app
     command: /bin/bash -c "pip3 install -r requirements.txt && python app.py"
     environment:
