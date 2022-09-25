@@ -76,7 +76,7 @@ services:
   # ===============
   mongo-express:
     #port:8081
-    image: mongo-express:4.4
+    image: mongo-express:0.54.0
     container_name: mongo-express
     hostname: mongo-express
     environment:
