@@ -274,9 +274,25 @@ def getByDate():
         return jsonify([])
 
 
-@app.route('/getLastById')
-def getLastById():
-    return jsonify([])
+@app.route('/getLastDataById')
+def getLastDataById():
+    idDevice = request.args.get('id')
+    mycol = mydb["devices"]
+    myquery = {"id": idDevice, "jenis.tipe": 'sensor'}
+    mydoc = mycol.find_one(myquery, projection={
+                           "_id": False})
+    if mydoc:
+        mycol = mydb[mydoc["jenis"]["model"]]
+        myquery = {"id": idDevice, "jenis.model": 'sensor'}
+        mydoc = mycol.find_one(projection={"_id": False}, sort=[('ts', -1)])
+        if mydoc:
+            mydoc['ts'] = (mydoc['ts'] + timedelta(hours=8)
+                           ).strftime('%Y-%m-%d %H:%M:%S')
+            return mydoc
+        else:
+            return jsonify({})
+    else:
+        return jsonify({})
 
 
 app.run(host='0.0.0.0', port=8080, debug=True)

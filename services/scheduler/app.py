@@ -1,3 +1,7 @@
+print("===============")
+print("Trigger Service")
+print("===============\n")
+
 from time import sleep
 from datetime import datetime
 import json
