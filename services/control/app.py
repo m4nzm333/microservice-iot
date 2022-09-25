@@ -114,6 +114,18 @@ def updateDeviceById():
         mycol.update_one(myquery, newvalues)
     return 'success'
 
+
+@app.route('/deleteById')
+def deleteDeviceById():
+    idDevice = request.args.get('id')
+    myquery = {
+        "id": idDevice
+    }
+    mycol = mydb["devices"]
+    mycol.delete_one(myquery)
+    return 'success'
+
+
 # ===============
 # Set Status Device
 # ===============
