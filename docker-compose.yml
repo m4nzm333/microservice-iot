@@ -175,7 +175,7 @@ services:
       - traefik.http.routers.api-control.service=api-control
       - traefik.http.services.api-control.loadbalancer.server.port=8080
 
-  api-schedueler:
+  api-scheduler:
     image: python:3.10.6-slim-bullseye
     container_name: api-scheduler
     hostname: api-scheduler
@@ -202,6 +202,34 @@ services:
       - traefik.http.routers.api-scheduler.rule=(Host(`api.myiot.com`) && (PathPrefix(`/scheduler/`) || PathPrefix(`/scheduler`)))
       - traefik.http.routers.api-scheduler.service=api-scheduler
       - traefik.http.services.api-scheduler.loadbalancer.server.port=8080
+
+  api-trigger:
+    image: python:3.10.6-slim-bullseye
+    container_name: api-trigger
+    hostname: api-trigger
+    volumes:
+      - ./services/api-trigger:/usr/src/app
+    environment:
+      DB_HOSTNAME: mongodb
+      DB_PORT: 27017
+      DB_USERNAME: root
+      DB_PASSWORD: 123456
+      DB_NAME: myiot
+      TZ: Asia/Makassar
+    networks:
+      - services-db
+      - services-proxy
+    working_dir: /usr/src/app
+    command: /bin/bash -c "pip3 install -r requirements.txt && python app.py"
+    labels:
+      - traefik.enable=true
+      - traefik.http.middlewares.api-trigger.stripprefix.forceslash=false
+      - traefik.http.middlewares.api-trigger.stripprefix.prefixes=/trigger/,/trigger
+      - traefik.http.routers.api-trigger.entrypoints=web
+      - traefik.http.routers.api-trigger.middlewares=api-trigger
+      - traefik.http.routers.api-trigger.rule=(Host(`api.myiot.com`) && (PathPrefix(`/trigger/`) || PathPrefix(`/trigger`)))
+      - traefik.http.routers.api-trigger.service=api-trigger
+      - traefik.http.services.api-trigger.loadbalancer.server.port=8080
 
   # ===============
   # Scheduler

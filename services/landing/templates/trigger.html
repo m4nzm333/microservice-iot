@@ -30,14 +30,13 @@
                                                 <th>Sensor</th>
                                                 <th>Jenis Trigger</th>
                                                 <th>Nilai</th>
-                                                <th>Terakhir Berubah</th>
                                                 <th>Nama Control</th>
                                                 <th>Set Status</th>
                                                 <th>Aksi</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr>
+                                            <!-- <tr>
                                                 <td>Kipas menyala jika panas</td>
                                                 <td>Suhu Ruang Tamu</td>
                                                 <td>Lebih dari</td>
@@ -76,7 +75,7 @@
                                                         <i class="fa fa-trash"></i>
                                                     </button>
                                                 </td>
-                                            </tr>
+                                            </tr> -->
                                         </tbody>
                                     </table>
                                 </div>
@@ -92,7 +91,7 @@
     <div class="modal fade" id="modalTrigger" tabindex="-1" role="dialog" aria-labelledby="modalTriggerLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
-                <form action="" method="post">
+                <form action="#" method="post" id="formTrigger">
                     <div class="modal-header">
                         <h5 class="modal-title" id="modalTriggerLabel">Tambah Trigger</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -101,6 +100,12 @@
                     </div>
                     <div class="modal-body">
                         <div class="container">
+                            <div class="form-group row">
+                                <label for="nama" class="col-4">Id Sensor</label>
+                                <div class="col-8">
+                                    <input type="text" name="id" id="id" class="form-control" placeholder="Id Sensor" required>
+                                </div>
+                            </div>
                             <div class="form-group row">
                                 <label for="nama" class="col-4">Nama Trigger</label>
                                 <div class="col-8">
@@ -113,9 +118,7 @@
                                 <label for="nama" class="col-4">Sensor</label>
                                 <div class="col-8">
                                     <select name="sensor" id="sensor" class="form-control">
-                                        <option value="suhu1">Suhu Ruang Tamu</option>
-                                        <option value="kelembapan1">Kelembapan Ruang Tamu</option>
-                                        <option value="cahaya1">Atap Teras</option>
+
                                     </select>
                                 </div>
                             </div>
@@ -130,37 +133,31 @@
                                 </div>
                             </div>
                             <div class="form-group row">
-                                <label for="value" class="col-4">Nilai Sensor</label>
+                                <label for="sensorValue" class="col-4">Nilai Sensor</label>
                                 <div class="col-8">
-                                    <input type="text" name="value" id="value" class="form-control" placeholder="Nilai Sensor">
+                                    <input type="text" name="sensorValue" id="sensorValue" class="form-control" placeholder="Nilai Sensor">
                                 </div>
                             </div>
                             <hr>
                             <h5>Control</h5>
                             <div class="form-group row">
-                                <label for="model" class="col-4">Control</label>
+                                <label for="control" class="col-4">Control</label>
                                 <div class="col-8">
-                                    <select name="model" id="model" class="form-control">
-                                        <option value="lampu1">Lampu Ruang Tengah</option>
-                                        <option value="kipas1">Kipas Tamu</option>
-                                        <option value="pompa1">Pompa PDAM</option>
+                                    <select name="control" id="control" class="form-control">
                                     </select>
                                 </div>
                             </div>
                             <div class="form-group row">
-                                <label for="value" class="col-4">Set Status</label>
+                                <label for="controlValue" class="col-4">Set Nilai</label>
                                 <div class="col-8">
-                                    <input type="text" name="value" id="value" class="form-control" placeholder="Set Status">
-                                </div>
-                                <div class="col-12">
-                                    <small class="text-danger">* Gunakan 0 atau 1 untuk status jika menggunakan model saklar</small>
+                                    <input type="text" name="controlValue" id="controlValue" class="form-control" placeholder="Set Nilai">
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Kembali</button>
-                        <button type="button" class="btn btn-success">
+                        <button type="submit" class="btn btn-success">
                             <i class="fa fa-save"></i> Simpan
                         </button>
                     </div>
@@ -172,13 +169,114 @@
     {% include('includes/scrollup.html') %}
     {% include('includes/script.html') %}
     <script defer>
-        var baseApiURL = 'https://api.myiot.com';
+        var baseApiURL = 'http://api.myiot.com';
 
-        $("#tableTrigger").dataTable();
+        async function initDatatable() {
+            var respond = await $.ajax({ url: `${baseApiURL}/trigger/getAll` });
+            var sensor = await $.ajax({ url: `${baseApiURL}/sensor/getAll` });
+            var control = await $.ajax({ url: `${baseApiURL}/control/getAll` });
+            $("#control").html('')
+            control.forEach(e => {
+                $("#control").append(`<option value="${e.id}">${e.nama}</option>`)
+            });
+
+            $("#sensor").html('')
+            sensor.forEach(e => {
+                $("#sensor").append(`<option value="${e.id}">${e.nama}</option>`)
+            });
+
+            $("#tableTrigger").dataTable({
+                data: respond,
+                destroy: true,
+                columns: [
+                    { data: "nama" },
+                    { data: "sensor.nama" },
+                    { data: "jenis" },
+                    { data: "sensorValue" },
+                    { data: "control.nama" },
+                    { data: "controlValue" },
+                    {
+                        data: "id",
+                        render: function (data, type, row) {
+                            return `<button class="btn btn-sm btn-primary btnEdit" data-id="${data}" data-nama="${row.nama}">
+                                    <i class="fa fa-edit"></i>
+                                </button>
+                                <button class="btn btn-sm btn-info btnGraph" data-id="${data}" data-nama="${row.nama}">
+                                    <i class="fa fa-history"></i>
+                                </button>
+                                <button class="btn btn-sm btn-danger btnDelete" data-id="${data}" data-nama="${row.nama}">
+                                    <i class="fa fa-trash"></i>
+                                </button>`;
+                        },
+                    },
+                ],
+                drawCallback: function () {
+                    /*
+                    $(".btnEdit").click(async function () {
+                        var idJadwal = $(this).data('id');
+                        var respond = await $.ajax({
+                            url: `${baseApiURL}/scheduler/getById`,
+                            data: { id: idJadwal }
+                        });
+                        $("#formJadwal").trigger('reset');
+                        $("#formJadwal").attr('action', `${baseApiURL}/scheduler/updateById`);
+                        $("#modalJadwalLabel").text(`Edit Sensor ${respond.nama}`);
+                        $("#modalJadwal").modal('show');
+                        $("#id").val(idJadwal);
+                        $("#id").attr('disabled', 'disabled');
+                        $("#id").addClass('disabled');
+                        $("#nama").val(respond.nama);
+                        $("#rumah").val(respond.rumah);
+                        $("#control").val(respond.control);
+                        $("#jamHarian").val(respond.jenis.jam);
+                        $("#value").val(respond.value);
+                    }); */
+
+                    /* $(".btnDelete").click(async function () {
+                        var idJadwal = $(this).data('id');
+                        var nama = $(this).data('nama');
+                        $("#modalDeleteLabel").text(`${nama} (${idJadwal})`);
+                        $("#btnConfirmDelete").attr('data-id', idJadwal);
+                        $("#modalDelete").modal('show');
+                    });
+                    */
+                }
+
+            });
+        }
+
+        initDatatable()
 
         $("#btnTambah").click(() => {
+            $("#formTrigger").trigger('reset');
+            $("#formTrigger").attr('action', `${baseApiURL}/trigger/insert`);
+            $("#modalJadwalLabel").text('Tambah Trigger');
+            $("#id").removeAttr('disabled');
+            $("#id").removeClass('disabled');
             $("#modalTrigger").modal('show');
-        })
+        });
+
+        $("#formTrigger").submit(function (ev) {
+            $.ajax({
+                type: 'post',
+                url: $("#formTrigger").attr('action'),
+                data: {
+                    'id': $("#id").val(),
+                    'nama': $("#nama").val(),
+                    'rumah': $("#rumah").val(),
+                    'jenis': $("#jenis").val(),
+                    'sensor': $("#sensor").val(),
+                    'sensorValue': $("#sensorValue").val(),
+                    'control': $("#control").val(),
+                    'controlValue': $("#controlValue").val(),
+                },
+                success: function () {
+                    initDatatable();
+                    $("#modalTrigger").modal('hide');
+                }
+            })
+            ev.preventDefault();
+        });
     </script>
 
 </body>
