@@ -29,7 +29,7 @@ def index():
 
 
 @app.route('/countAll')
-def countControlAll():
+def countSchedulerAll():
     mycol = mydb["scheduler"]
     mydoc = mycol.find(projection={"data": False, "_id": False})
     json_data = dumps(list(mydoc), indent=2)
@@ -41,7 +41,7 @@ def countControlAll():
 # CRUD Jadwal
 # ===============
 @app.route('/getAll')
-def getAll():
+def getSchedulerAll():
     mycol = mydb["scheduler"]
     mydoc = mycol.find(projection={"_id": False})
     json_data = dumps(list(mydoc), indent=2)
@@ -53,7 +53,8 @@ def getAll():
             "jenis.tipe": "control",
             "id": schedule['control']
         }
-        controlDoc = controlCol.find(controlQuery, projection={"_id": False, "rumah": False, "value" : False})
+        controlDoc = controlCol.find(controlQuery, projection={
+                                     "_id": False, "rumah": False, "value": False})
         rowData = list(controlDoc)
         if rowData:
             schedule['control'] = rowData[0]
@@ -65,17 +66,18 @@ def getAll():
 
 
 @app.route('/getById')
-def getById():
-    idDevice = request.args.get('id')
+def getSchedulerById():
+    idJadwal = request.args.get('id')
     mycol = mydb["scheduler"]
-    mydoc = mycol.find(projection={"_id": False})
-    rowData = list(mydoc)
-    if rowData:
-        json_data = dumps(rowData[0], indent=2)
-        print(json_data)
-        return json_data
+    myquery = {
+        "id": idJadwal
+    }
+    mydoc = mycol.find_one(myquery, projection={"_id": False})
+    if mydoc:
+        return mydoc
     else:
         return jsonify([])
+
 
 @app.route('/insert', methods=['POST'])
 def insertScheduler():
@@ -94,12 +96,48 @@ def insertScheduler():
         },
         "nama": nama,
         "rumah": rumah,
-        "control" : control,
+        "control": control,
         "value": value
     }
     mycol = mydb["scheduler"]
     mycol.insert_one(mydict)
     return 'success'
 
+
+@app.route('/updateById', methods=['POST'])
+def updateSchedulerById():
+    idJadwal = request.form.get('id')
+    nama = request.form.get('nama', idJadwal)
+    control = request.form.get('control')
+    rumah = request.form.get('rumah', default='rumahku')
+    value = request.form.get('value', default=0)
+    jamHarian = request.form.get('jamHarian', default="00:00")
+
+    mycol = mydb["scheduler"]
+    myquery = {"id": idJadwal}
+    
+    newvalues = {"$set":  {
+        "jenis": {
+            "tipe": 'harian',
+            "jam": jamHarian,
+        },
+        "nama": nama,
+        "rumah": rumah,
+        "control": control,
+        "value": value
+    }}
+    mycol.update_one(myquery, newvalues)
+    return 'success'
+
+
+@app.route('/deleteById')
+def deleteDeviceById():
+    idJadwal = request.args.get('id')
+    myquery = {
+        "id": idJadwal
+    }
+    mycol = mydb["scheduler"]
+    mycol.delete_one(myquery)
+    return 'success'
 
 app.run(host='0.0.0.0', port=8080, debug=True)

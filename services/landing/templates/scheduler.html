@@ -125,6 +125,21 @@
         </div>
     </div>
 
+    <div class="modal fade" id="modalDelete" tabindex="-1" role="dialog" aria-labelledby="modalDeleteLabel" aria-hidden="true">
+        <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    Hapus Sensor <b id="modalDeleteLabel"></b> ?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Kembali</button>
+                    <button type="button" class="btn btn-danger" id="btnConfirmDelete">
+                        <i class="fa fa-trash"></i> Hapus
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script defer>
         var baseApiURL = 'http://api.myiot.com';
@@ -167,18 +182,48 @@
                     {
                         data: "id",
                         render: function (data, type, row) {
-                            return `<button class="btn btn-sm btn-primary" data-id="${data} data-nama="${row.nama}">
+                            return `<button class="btn btn-sm btn-primary btnEdit" data-id="${data}" data-nama="${row.nama}">
                                     <i class="fa fa-edit"></i>
                                 </button>
                                 <button class="btn btn-sm btn-info btnGraph" data-id="${data}" data-nama="${row.nama}">
                                     <i class="fa fa-history"></i>
                                 </button>
-                                <button class="btn btn-sm btn-danger" data-id="${data}" data-nama="${row.nama}">
+                                <button class="btn btn-sm btn-danger btnDelete" data-id="${data}" data-nama="${row.nama}">
                                     <i class="fa fa-trash"></i>
                                 </button>`;
                         },
                     },
-                ]
+                ],
+                drawCallback: function () {
+                    $(".btnEdit").click(async function () {
+                        var idJadwal = $(this).data('id');
+                        var respond = await $.ajax({
+                            url: `${baseApiURL}/scheduler/getById`,
+                            data: { id: idJadwal }
+                        });
+                        $("#formJadwal").trigger('reset');
+                        $("#formJadwal").attr('action', `${baseApiURL}/scheduler/updateById`);
+                        $("#modalJadwalLabel").text(`Edit Sensor ${respond.nama}`);
+                        $("#modalJadwal").modal('show');
+                        $("#id").val(idJadwal);
+                        $("#id").attr('disabled', 'disabled');
+                        $("#id").addClass('disabled');
+                        $("#nama").val(respond.nama);
+                        $("#rumah").val(respond.rumah);
+                        $("#control").val(respond.control);
+                        $("#jamHarian").val(respond.jenis.jam);
+                        $("#value").val(respond.value);
+                    });
+
+                    $(".btnDelete").click(async function () {
+                        var idJadwal = $(this).data('id');
+                        var nama = $(this).data('nama');
+                        $("#modalDeleteLabel").text(`${nama} (${idJadwal})`);
+                        $("#btnConfirmDelete").attr('data-id', idJadwal);
+                        $("#modalDelete").modal('show');
+                    });
+                }
+
             });
         }
 
@@ -192,6 +237,14 @@
             $("#id").removeClass('disabled');
             $("#modalJadwal").modal('show');
         });
+
+        $("#btnConfirmDelete").click(function() {
+            var idJadwal = $(this).data('id');
+            $.ajax({ url: `${baseApiURL}/scheduler/deleteById?id=${idJadwal}` });
+            $("#modalDelete").modal('hide');
+            initDatatable();
+        });
+
 
         $("#formJadwal").submit(function (ev) {
             $.ajax({
