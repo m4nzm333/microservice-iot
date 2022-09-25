@@ -41,7 +41,7 @@ def countControlAll():
 # CRUD Jadwal
 # ===============
 @app.route('/getAll')
-def getDevicesAll():
+def getAll():
     mycol = mydb["scheduler"]
     mydoc = mycol.find(projection={"_id": False})
     json_data = dumps(list(mydoc), indent=2)
@@ -65,7 +65,7 @@ def getDevicesAll():
 
 
 @app.route('/getById')
-def getDevicesById():
+def getById():
     idDevice = request.args.get('id')
     mycol = mydb["scheduler"]
     mydoc = mycol.find(projection={"_id": False})
@@ -76,6 +76,30 @@ def getDevicesById():
         return json_data
     else:
         return jsonify([])
+
+@app.route('/insert', methods=['POST'])
+def insertScheduler():
+    idJadwal = request.form.get('id')
+    nama = request.form.get('nama', idJadwal)
+    control = request.form.get('control')
+    rumah = request.form.get('rumah', default='rumahku')
+    value = request.form.get('value', default=0)
+    jamHarian = request.form.get('jamHarian', default="00:00")
+
+    mydict = {
+        "id": idJadwal,
+        "jenis": {
+            "tipe": 'harian',
+            "jam": jamHarian,
+        },
+        "nama": nama,
+        "rumah": rumah,
+        "control" : control,
+        "value": value
+    }
+    mycol = mydb["scheduler"]
+    mycol.insert_one(mydict)
+    return 'success'
 
 
 app.run(host='0.0.0.0', port=8080, debug=True)

@@ -53,7 +53,7 @@
     <div class="modal fade" id="modalJadwal" tabindex="-1" role="dialog" aria-labelledby="modalJadwalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
-                <form action="" method="post">
+                <form action="#" method="post" id="formJadwal">
                     <div class="modal-header">
                         <h5 class="modal-title" id="modalJadwalLabel">Tambah Jadwal</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -63,27 +63,37 @@
                     <div class="modal-body">
                         <div class="container">
                             <div class="form-group row">
+                                <label for="id" class="col-4">Id Jadwal</label>
+                                <div class="col-8">
+                                    <input type="text" name="id" id="id" class="form-control" placeholder="Id Jadwal" required>
+                                </div>
+                            </div>
+                            <div class="form-group row">
                                 <label for="nama" class="col-4">Nama Jadwal</label>
                                 <div class="col-8">
-                                    <input type="text" name="nama" id="nama" class="form-control" placeholder="Nama Jadwal">
+                                    <input type="text" name="nama" id="nama" class="form-control" placeholder="Nama Jadwal" required>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="rumah" class="col-4">Rumah</label>
+                                <div class="col-8">
+                                    <select name="rumah" id="rumah" class="form-control" required>
+                                        <option value="rumahku">Rumah Ku</option>
+                                        <option value="rumahTetangga">Rumah Tetangga</option>
+                                    </select>
                                 </div>
                             </div>
                             <hr>
                             <h5>Jadwal</h5>
                             <div class="form-group row">
-                                <label for="model" class="col-4">Jenis Jadwal</label>
-                                <div class="col-8">
-                                    <select name="model" id="model" class="form-control">
-                                        <option value="saklar">Harian</option>
-                                        <option value="skala">Mingguan</option>
-                                        <option value="skala">Bulanan</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="form-group row">
                                 <label for="jamHarian" class="col-4">Jam Jadwal</label>
                                 <div class="col-8">
-                                    <input type="text" id="jamHarian" class="form-control" placeholder="Contoh: 16:00">
+                                    <div class="input-group clockpicker">
+                                        <input type="text" class="form-control" id="jamHarian" placeholder="Contoh: 16:00" data-autoclose="true">
+                                        <span class="input-group-addon">
+                                            <span class="glyphicon glyphicon-time"></span>
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
                             <hr>
@@ -91,27 +101,22 @@
                             <div class="form-group row">
                                 <label for="model" class="col-4">Control</label>
                                 <div class="col-8">
-                                    <select name="model" id="model" class="form-control">
-                                        <option value="lampu1">Lampu Ruang Tengah</option>
-                                        <option value="kipas1">Kipas Tamu</option>
-                                        <option value="pompa1">Pompa PDAM</option>
+                                    <select name="control" id="control" class="form-control">
+
                                     </select>
                                 </div>
                             </div>
                             <div class="form-group row">
                                 <label for="value" class="col-4">Nilai</label>
                                 <div class="col-8">
-                                    <input type="text" name="value" id="value" class="form-control" placeholder="Nilai Awal">
+                                    <input type="text" name="value" id="value" class="form-control" placeholder="Nilai">
                                 </div>
-                            </div>
-                            <div class="col-12">
-                                <small class="text-danger">* Gunakan 0 atau 1 untuk nilai jika menggunakan model saklar</small>
                             </div>
                         </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Kembali</button>
-                        <button type="button" class="btn btn-success">
+                        <button type="submit" class="btn btn-success">
                             <i class="fa fa-save"></i> Simpan
                         </button>
                     </div>
@@ -124,11 +129,19 @@
     <script defer>
         var baseApiURL = 'http://api.myiot.com';
 
+        $("#jamHarian").clockpicker()
+
         async function initDatatable() {
             var respond = await $.ajax({ url: `${baseApiURL}/scheduler/getAll` });
-            console.log(respond);
+            var control = await $.ajax({ url: `${baseApiURL}/control/getAll` });
+            $("#control").html('')
+            control.forEach(e => {
+                $("#control").append(`<option value="${e.id}">${e.nama}</option>`)
+            });
+
             $("#tableJadwal").dataTable({
                 data: respond,
+                destroy: true,
                 columns: [
                     { data: "nama" },
                     {
@@ -172,8 +185,34 @@
         initDatatable();
 
         $("#btnTambah").click(() => {
+            $("#formJadwal").trigger('reset');
+            $("#formJadwal").attr('action', `${baseApiURL}/scheduler/insert`);
+            $("#modalJadwalLabel").text('Tambah Jadwal');
+            $("#id").removeAttr('disabled');
+            $("#id").removeClass('disabled');
             $("#modalJadwal").modal('show');
-        })
+        });
+
+        $("#formJadwal").submit(function (ev) {
+            $.ajax({
+                type: 'post',
+                url: $("#formJadwal").attr('action'),
+                data: {
+                    'id': $("#id").val(),
+                    'nama': $("#nama").val(),
+                    'rumah': $("#rumah").val(),
+                    'jamHarian': $("#jamHarian").val(),
+                    'control': $("#control").val(),
+                    'value': $("#value").val(),
+                },
+                success: function () {
+                    initDatatable();
+                    $("#modalJadwal").modal('hide');
+                }
+            })
+            ev.preventDefault();
+        });
+
     </script>
 
 </body>
