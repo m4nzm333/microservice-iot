@@ -146,11 +146,11 @@ def updateTriggerById():
 
 @app.route('/deleteById')
 def deleteTriggerById():
-    idJadwal = request.args.get('id')
+    idTrigger = request.args.get('id')
     myquery = {
-        "id": idJadwal
+        "id": idTrigger
     }
-    mycol = mydb["scheduler"]
+    mycol = mydb["trigger"]
     mycol.delete_one(myquery)
     return 'success'
 

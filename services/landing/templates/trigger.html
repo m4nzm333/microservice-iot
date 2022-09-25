@@ -36,46 +36,6 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <!-- <tr>
-                                                <td>Kipas menyala jika panas</td>
-                                                <td>Suhu Ruang Tamu</td>
-                                                <td>Lebih dari</td>
-                                                <td>34</td>
-                                                <td>2022-02-20 20:20:20</td>
-                                                <td>Kipas Ruang Tamu</td>
-                                                <td>1</td>
-                                                <td>
-                                                    <button class="btn btn-sm btn-primary">
-                                                        <i class="fa fa-edit"></i>
-                                                    </button>
-                                                    <button class="btn btn-sm btn-info">
-                                                        <i class="fa fa-clock"></i>
-                                                    </button>
-                                                    <button class="btn btn-sm btn-danger">
-                                                        <i class="fa fa-trash"></i>
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>Kipas menyala jika dingin</td>
-                                                <td>Suhu Ruang Tamu</td>
-                                                <td>Kurang dari</td>
-                                                <td>29</td>
-                                                <td>2022-09-21 12:45:23</td>
-                                                <td>Kipas Ruang Tamu</td>
-                                                <td>0</td>
-                                                <td>
-                                                    <button class="btn btn-sm btn-primary">
-                                                        <i class="fa fa-edit"></i>
-                                                    </button>
-                                                    <button class="btn btn-sm btn-info">
-                                                        <i class="fa fa-clock"></i>
-                                                    </button>
-                                                    <button class="btn btn-sm btn-danger">
-                                                        <i class="fa fa-trash"></i>
-                                                    </button>
-                                                </td>
-                                            </tr> -->
                                         </tbody>
                                     </table>
                                 </div>
@@ -166,6 +126,22 @@
         </div>
     </div>
 
+    <div class="modal fade" id="modalDelete" tabindex="-1" role="dialog" aria-labelledby="modalDeleteLabel" aria-hidden="true">
+        <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    Hapus Trigger Trigger <b id="modalDeleteLabel"></b> ?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Kembali</button>
+                    <button type="button" class="btn btn-danger" id="btnConfirmDelete">
+                        <i class="fa fa-trash"></i> Hapus
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     {% include('includes/scrollup.html') %}
     {% include('includes/script.html') %}
     <script defer>
@@ -231,16 +207,15 @@
                         $("#sensor").val(respond.sensor);
                         $("#sensorValue").val(respond.sensorValue);
                         $("#jenis").val(respond.jenis);
-                    }); 
+                    });
 
-                    /* $(".btnDelete").click(async function () {
+                    $(".btnDelete").click(async function () {
                         var idJadwal = $(this).data('id');
                         var nama = $(this).data('nama');
                         $("#modalDeleteLabel").text(`${nama} (${idJadwal})`);
                         $("#btnConfirmDelete").attr('data-id', idJadwal);
                         $("#modalDelete").modal('show');
                     });
-                    */
                 }
 
             });
@@ -277,6 +252,13 @@
                 }
             })
             ev.preventDefault();
+        });
+
+        $("#btnConfirmDelete").click(function () {
+            var idJadwal = $(this).data('id');
+            $.ajax({ url: `${baseApiURL}/trigger/deleteById?id=${idJadwal}` });
+            $("#modalDelete").modal('hide');
+            initDatatable();
         });
     </script>
 
