@@ -58,14 +58,12 @@ def getDevicesById():
         "jenis.tipe": "control",
         "id": idDevice
     }
-    mydoc = mycol.find(myquery, projection={"data": False, "_id": False})
-    rowData = list(mydoc)
-    if rowData:
-        json_data = dumps(rowData[0], indent=2)
-        print(json_data)
-        return json_data
+    mydoc = mycol.find_one(myquery, projection={"_id": False})
+    if mydoc:
+        return mydoc
     else:
-        return jsonify([])
+        jsonify([])
+
 
 @app.route('/insertDevice', methods=['POST'])
 def insertDevices():
@@ -84,15 +82,43 @@ def insertDevices():
         },
         "nama": nama,
         "rumah": rumah,
-        "value" : value
+        "value": value
     }
     mycol = mydb["devices"]
     mycol.insert_one(mydict)
     return 'success'
 
+
+@app.route('/updateById', methods=['POST'])
+def updateDeviceById():
+    idDevice = request.form.get('id')
+    nama = request.form.get('nama', idDevice)
+    model = request.form.get('model')
+    rumah = request.form.get('rumah', default='rumahku')
+    value = request.form.get('value', default=0)
+
+    mycol = mydb["devices"]
+    myquery = {"id": idDevice}
+
+    if (nama):
+        newvalues = {"$set":  {
+            "jenis": {
+                "tipe": 'control',
+                "model": model,
+                "metode": "saklar"
+            },
+            "nama": nama,
+            "rumah": rumah,
+            "value": value
+        }}
+        mycol.update_one(myquery, newvalues)
+    return 'success'
+
 # ===============
 # Set Status Device
 # ===============
+
+
 @app.route('/toggle')
 def toogleControlById():
     idDevice = request.args.get('id')
@@ -162,7 +188,6 @@ def setValueById():
         return dumps(mydoc)
     else:
         return jsonify([])
-
 
 
 app.run(host='0.0.0.0', port=8080, debug=True)

@@ -23,10 +23,10 @@
                                         <i class="fa fa-plus"></i> Tambah Control
                                     </button>
                                     <hr>
-                                    <table id="tableSensor" class="table table-striped">
+                                    <table id="tableControl" class="table table-striped">
                                         <thead>
                                             <tr>
-                                                <th>Nama Sensor</th>
+                                                <th>Nama Control</th>
                                                 <th>Jenis</th>
                                                 <th>Status</th>
                                                 <th>Aksi</th>
@@ -62,7 +62,7 @@
                             <div class="form-group row">
                                 <label for="nama" class="col-4">Id Control</label>
                                 <div class="col-8">
-                                    <input type="text" name="id" id="id" class="form-control" placeholder="Id Sensor" required>
+                                    <input type="text" name="id" id="id" class="form-control" placeholder="Id Control" required>
                                 </div>
                             </div>
                             <div class="form-group row">
@@ -116,7 +116,7 @@
             var respond = await $.ajax({
                 url: `${baseApiURL}/control/getAll`
             });
-            $("#tableSensor").dataTable({
+            $("#tableControl").dataTable({
                 data: respond,
                 destroy: true,
                 columns: [
@@ -134,7 +134,7 @@
                     {
                         data: "id",
                         render: function (data, type, row) {
-                            return `<button class="btn btn-sm btn-primary" data-id="${data} data-nama="${row.nama}">
+                            return `<button class="btn btn-sm btn-primary btnEdit" data-id="${data}" data-nama="${row.nama}">
                                     <i class="fa fa-edit"></i>
                                 </button>
                                 <button class="btn btn-sm btn-info btnGraph" data-id="${data}" data-nama="${row.nama}">
@@ -164,6 +164,26 @@
                             $(this).text('Mati')
                         }
                     });
+
+                    $(".btnEdit").click(async function () {
+                        var idDevice = $(this).data('id');
+                        var respond = await $.ajax({
+                            url: `${baseApiURL}/control/getById`,
+                            data: { id: idDevice }
+                        });
+                        $("#formControl").trigger('reset');
+                        $("#formControl").attr('action', `${baseApiURL}/control/updateById`);
+                        $("#modalControlLabel").text(`Edit Control ${respond.nama}`);
+                        $("#modalControl").modal('show');
+                        $("#id").val(idDevice);
+                        $("#id").attr('disabled', 'disabled');
+                        $("#id").addClass('disabled');
+                        $("#nama").val(respond.nama);
+                        $("#rumah").val(respond.rumah);
+                        console.log(respond)
+                        $("#model").val(respond.jenis.model);
+                        $("#value").val(respond.value);
+                    });
                 }
             });
         }
@@ -192,7 +212,7 @@
                 },
                 success: function () {
                     initDatatable();
-                    $("#modalSensor").modal('hide');
+                    $("#modalControl").modal('hide');
                 }
             })
             ev.preventDefault();
