@@ -119,25 +119,26 @@ def insertTrigger():
 
 @app.route('/updateById', methods=['POST'])
 def updateTriggerById():
-    idJadwal = request.form.get('id')
-    nama = request.form.get('nama', idJadwal)
-    control = request.form.get('control')
+    idTrigger = request.form.get('id')
+    nama = request.form.get('nama', idTrigger)
     rumah = request.form.get('rumah', default='rumahku')
-    value = request.form.get('value', default=0)
-    jamHarian = request.form.get('jamHarian', default="00:00")
+    jenis = request.form.get('jenis', default='equal')
+    sensor = request.form.get('sensor')
+    sensorValue = request.form.get('sensorValue', default=0)
+    control = request.form.get('control')
+    controlValue = request.form.get('controlValue', default=0)
 
-    mycol = mydb["scheduler"]
-    myquery = {"id": idJadwal}
+    mycol = mydb["trigger"]
+    myquery = {"id": idTrigger}
 
     newvalues = {"$set":  {
-        "jenis": {
-            "tipe": 'harian',
-            "jam": jamHarian,
-        },
+        "jenis": jenis,
         "nama": nama,
         "rumah": rumah,
+        "sensor": sensor,
+        "sensorValue": sensorValue,
         "control": control,
-        "value": value
+        "controlValue": controlValue
     }}
     mycol.update_one(myquery, newvalues)
     return 'success'

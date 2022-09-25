@@ -211,26 +211,27 @@
                     },
                 ],
                 drawCallback: function () {
-                    /*
                     $(".btnEdit").click(async function () {
                         var idJadwal = $(this).data('id');
                         var respond = await $.ajax({
-                            url: `${baseApiURL}/scheduler/getById`,
+                            url: `${baseApiURL}/trigger/getById`,
                             data: { id: idJadwal }
                         });
-                        $("#formJadwal").trigger('reset');
-                        $("#formJadwal").attr('action', `${baseApiURL}/scheduler/updateById`);
-                        $("#modalJadwalLabel").text(`Edit Sensor ${respond.nama}`);
-                        $("#modalJadwal").modal('show');
+                        $("#formTrigger").trigger('reset');
+                        $("#formTrigger").attr('action', `${baseApiURL}/trigger/updateById`);
+                        $("#modalTriggerLabel").text(`Edit Sensor ${respond.nama}`);
+                        $("#modalTrigger").modal('show');
                         $("#id").val(idJadwal);
                         $("#id").attr('disabled', 'disabled');
                         $("#id").addClass('disabled');
                         $("#nama").val(respond.nama);
                         $("#rumah").val(respond.rumah);
                         $("#control").val(respond.control);
-                        $("#jamHarian").val(respond.jenis.jam);
-                        $("#value").val(respond.value);
-                    }); */
+                        $("#controlValue").val(respond.controlValue);
+                        $("#sensor").val(respond.sensor);
+                        $("#sensorValue").val(respond.sensorValue);
+                        $("#jenis").val(respond.jenis);
+                    }); 
 
                     /* $(".btnDelete").click(async function () {
                         var idJadwal = $(this).data('id');
