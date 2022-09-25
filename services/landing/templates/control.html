@@ -50,7 +50,7 @@
     <div class="modal fade" id="modalControl" tabindex="-1" role="dialog" aria-labelledby="modalSesorLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
-                <form action="" method="post">
+                <form id="formControl" action="#" method="post">
                     <div class="modal-header">
                         <h5 class="modal-title" id="modalSesorLabel">Tambah Control</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -60,34 +60,47 @@
                     <div class="modal-body">
                         <div class="container">
                             <div class="form-group row">
+                                <label for="nama" class="col-4">Id Control</label>
+                                <div class="col-8">
+                                    <input type="text" name="id" id="id" class="form-control" placeholder="Id Sensor" required>
+                                </div>
+                            </div>
+                            <div class="form-group row">
                                 <label for="nama" class="col-4">Nama Control</label>
                                 <div class="col-8">
                                     <input type="text" name="nama" id="nama" class="form-control" placeholder="Nama Control">
                                 </div>
                             </div>
                             <div class="form-group row">
-                                <label for="model" class="col-4">Tipe</label>
+                                <label for="rumah" class="col-4">Rumah</label>
                                 <div class="col-8">
-                                    <select name="model" id="model" class="form-control">
-                                        <option value="saklar">Saklar</option>
-                                        <option value="skala">Skala</option>
+                                    <select name="rumah" id="rumah" class="form-control" required>
+                                        <option value="rumahku">Rumah Ku</option>
+                                        <option value="rumahTetangga">Rumah Tetangga</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="model" class="col-4">Model</label>
+                                <div class="col-8">
+                                    <select name="rumah" id="model" class="form-control" required>
+                                        <option value="kipas">Kipas</option>
+                                        <option value="lampu">Lampu</option>
+                                        <option value="pompa">Pompa</option>
                                     </select>
                                 </div>
                             </div>
                             <div class="form-group row">
                                 <label for="value" class="col-4">Nilai Awal</label>
                                 <div class="col-8">
-                                    <input type="text" name="value" id="value" class="form-control" placeholder="Nilai Awal">
-                                </div>
-                                <div class="col-12">
-                                    <small class="text-danger">* Gunakan 0 atau 1 untuk nilai awal jika menggunakan model saklar</small>
+                                    <input type="text" name="value" id="value" class="form-control" placeholder="Nilai Awal" required>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Kembali</button>
-                        <button type="button" class="btn btn-success">
+                        <button type="submit" class="btn btn-success">
                             <i class="fa fa-save"></i> Simpan
                         </button>
                     </div>
@@ -103,9 +116,9 @@
             var respond = await $.ajax({
                 url: `${baseApiURL}/control/getAll`
             });
-            console.log(respond);
             $("#tableSensor").dataTable({
                 data: respond,
+                destroy: true,
                 columns: [
                     { data: "nama" },
                     { data: "jenis.model" },
@@ -140,7 +153,6 @@
                             url: `${baseApiURL}/control/toggle`,
                             data: { id: idDevice }
                         });
-                        console.log(this)
                         if (respond.value == 0) {
                             console.log('trigered')
                             $(this).removeClass('badge-danger');
@@ -158,10 +170,33 @@
 
         initDatatable();
 
-
         $("#btnTambah").click(() => {
+            $("#formControl").trigger('reset');
+            $("#formControl").attr('action', `${baseApiURL}/control/insertDevice`);
+            $("#modalControlLabel").text('Tambah Control');
+            $("#id").removeAttr('disabled');
+            $("#id").removeClass('disabled');
             $("#modalControl").modal('show');
-        })
+        });
+
+        $("#formControl").submit(function (ev) {
+            $.ajax({
+                type: 'post',
+                url: $("#formControl").attr('action'),
+                data: {
+                    'id': $("#id").val(),
+                    'nama': $("#nama").val(),
+                    'rumah': $("#rumah").val(),
+                    'model': $("#model").val(),
+                    'value': $("#value").val(),
+                },
+                success: function () {
+                    initDatatable();
+                    $("#modalSensor").modal('hide');
+                }
+            })
+            ev.preventDefault();
+        });
     </script>
 
 </body>

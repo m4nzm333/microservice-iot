@@ -47,19 +47,7 @@ def getDevicesAll():
     myquery = {"jenis.tipe": "control"}
     mydoc = mycol.find(myquery, projection={"data": False, "_id": False})
     json_data = list(mydoc)
-    returnData = []
-    for device in json_data:
-        historyCol = mydb["history"]
-        historyQuery = {"idDevice": device["id"]}
-        historyDoc = historyCol.find_one(
-            historyQuery, projection={"_id": False}, sort=[("ts", -1)])
-        historyReturn = historyDoc
-        historyReturn["ts"] = (historyReturn.get(
-            'ts') + timedelta(hours=+8)).strftime('%Y-%m-%d %H:%M:%S')
-        device['last_history'] = json.loads(json.dumps(
-            historyDoc, indent=4, sort_keys=True, default=str))
-        returnData.append(device)
-    return returnData
+    return json_data
 
 
 @app.route('/getById')
@@ -79,6 +67,28 @@ def getDevicesById():
     else:
         return jsonify([])
 
+@app.route('/insertDevice', methods=['POST'])
+def insertDevices():
+    idDevice = request.form.get('id')
+    nama = request.form.get('nama', idDevice)
+    model = request.form.get('model')
+    rumah = request.form.get('rumah', default='rumahku')
+    value = request.form.get('value', default=0)
+
+    mydict = {
+        "id": idDevice,
+        "jenis": {
+            "tipe": 'control',
+            "model": model,
+            "metode": "saklar"
+        },
+        "nama": nama,
+        "rumah": rumah,
+        "value" : value
+    }
+    mycol = mydb["devices"]
+    mycol.insert_one(mydict)
+    return 'success'
 
 # ===============
 # Set Status Device
