@@ -144,6 +144,22 @@
         </div>
     </div>
 
+    <div class="modal fade" id="modalDelete" tabindex="-1" role="dialog" aria-labelledby="modalDeleteLabel" aria-hidden="true">
+        <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    Hapus Sensor <b id="modalDeleteLabel"></b> ?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Kembali</button>
+                    <button type="button" class="btn btn-danger" id="btnConfirmDelete">
+                        <i class="fa fa-trash"></i> Hapus
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script defer>
         var baseApiURL = 'http://api.myiot.com';
 
@@ -199,7 +215,7 @@
                                 <button class="btn btn-sm btn-info btnGraph" data-id="${data}" data-nama="${row.nama}">
                                     <i class="fa fa-chart-line"></i>
                                 </button>
-                                <button class="btn btn-sm btn-danger" data-id="${data}" data-nama="${row.nama}">
+                                <button class="btn btn-sm btn-danger btnDelete" data-id="${data}" data-nama="${row.nama}">
                                     <i class="fa fa-trash"></i>
                                 </button>`;
                         },
@@ -271,6 +287,15 @@
                         $("#model").val(respond.jenis.model);
                         $("#satuan").val(respond.jenis.satuan);
                     });
+
+                    $(".btnDelete").click(async function () {
+                        var idDevice = $(this).data('id');
+                        var nama = $(this).data('nama');
+                        $("#modalDeleteLabel").text(`${nama} (${idDevice})`);
+                        $("#btnConfirmDelete").attr('data-id', idDevice);
+                        $("#modalDelete").modal('show');
+                    });
+
                 }
             });
         }
@@ -284,6 +309,13 @@
             $("#id").removeAttr('disabled');
             $("#id").removeClass('disabled');
             $("#modalSensor").modal('show');
+        });
+
+        $("#btnConfirmDelete").click(function() {
+            var idDevice = $(this).data('id');
+            $.ajax({ url: `${baseApiURL}/sensor/deleteById?id=${idDevice}` });
+            $("#modalDelete").modal('hide');
+            initDatatable();
         });
 
         $("#formSensor").submit(function (ev) {

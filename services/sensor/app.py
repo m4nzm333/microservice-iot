@@ -129,7 +129,7 @@ def updateDeviceById():
     return 'success'
 
 
-@app.route('/devices/delete')
+@app.route('/deleteById')
 def deleteDeviceById():
     idDevice = request.args.get('id')
     myquery = {
