@@ -247,6 +247,7 @@ services:
       TZ: Asia/Makassar
     networks:
       - services-db
+      - services-proxy
 
 networks:
   services-proxy:
