@@ -40,11 +40,11 @@ void callback(char *topic, byte *payload, unsigned int length)
     Serial.println(value);
     if (value == 1)
     {
-        digitalWrite(PIN_KIPAS, HIGH);
+        digitalWrite(PIN_KIPAS, LOW);
     }
     else
     {
-        digitalWrite(PIN_KIPAS, LOW);
+        digitalWrite(PIN_KIPAS, HIGH);
     }
 }
 
@@ -54,7 +54,7 @@ void setup()
     Serial.begin(115200);
     // Pin Mode
     pinMode(PIN_KIPAS, OUTPUT);
-    digitalWrite(PIN_KIPAS, LOW);
+    digitalWrite(PIN_KIPAS, HIGH);
     // Wifi Begin
     Serial.printf("Connecting to %s \n", ssid);
     WiFi.begin(ssid, password);
