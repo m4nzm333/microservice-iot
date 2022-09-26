@@ -58,4 +58,5 @@ while True:
                             sensor=idSensor, currentValue=lastData['value'], jenis=jenis, sensorData=sensorValue, control=idControl, controlValue=controlValue))
 
     # Delay selama 5 detik
+    
     sleep(5)
