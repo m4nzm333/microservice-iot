@@ -140,9 +140,8 @@ def toogleControlById():
         "jenis.tipe": "control",
         "id": idDevice
     }
-    mydoc = mycol.find_one(myquery, projection={"data": False, "_id": False})
-    if mydoc:
-        mydoc = 0
+    mydoc = mycol.find_one(myquery, projection={"_id": False})
+    if mydoc: 
         if mydoc['value']:
             value = 0
             newvalues = {"$set": {"value": value}}
