@@ -23,6 +23,8 @@
                 "d:\\USERDATA\\Documents\\Project\\skripsi-microservices\\build\\core",
                 "C:\\Users\\m4nzm333\\AppData\\Local\\Arduino15\\packages\\esp8266\\hardware\\esp8266\\3.0.2\\cores\\esp8266",
                 "C:\\Users\\m4nzm333\\AppData\\Local\\Arduino15\\packages\\esp8266\\hardware\\esp8266\\3.0.2\\variants\\generic",
+                "D:\\USERDATA\\Documents\\Arduino\\libraries\\BH1750\\src",
+                "C:\\Users\\m4nzm333\\AppData\\Local\\Arduino15\\packages\\esp8266\\hardware\\esp8266\\3.0.2\\libraries\\Wire",
                 "C:\\Users\\m4nzm333\\AppData\\Local\\Arduino15\\packages\\esp8266\\hardware\\esp8266\\3.0.2\\libraries\\ESP8266WiFi\\src",
                 "D:\\USERDATA\\Documents\\Arduino\\libraries\\PubSubClient\\src",
                 "c:\\users\\m4nzm333\\appdata\\local\\arduino15\\packages\\esp8266\\tools\\xtensa-lx106-elf-gcc\\3.0.4-gcc10.3-1757bed\\xtensa-lx106-elf\\include\\c++\\10.3.0",
