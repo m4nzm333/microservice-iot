@@ -156,27 +156,15 @@ def toogleControlById():
             value = 1
             newvalues = {"$set": {"value": value}}
             mycol.update_one(myquery, newvalues)
-        # Masukkan trigger
-        if trigger == 'scheduled':
-
-            mydict = {
-                "idDevice": idDevice,
-                "ts": datetime.now(),
-                "value": value,
-                "trigger": trigger
-            }
-            mycol = mydb["history"]
-            mycol.insert_one(mydict)
-        else:
-            trigger = 'manual'
-            mydict = {
-                "idDevice": idDevice,
-                "ts": datetime.now(),
-                "value": value,
-                "trigger": trigger
-            }
-            mycol = mydb["history"]
-            mycol.insert_one(mydict)
+        # Masukkan data history
+        historyDict = {
+            "idDevice": idDevice,
+            "ts": datetime.now(),
+            "value": value,
+            "trigger": trigger
+        }
+        historyCol = mydb["history"]
+        historyCol.insert_one(historyDict)
 
         return json_data
     else:
@@ -197,9 +185,24 @@ def setValueById():
         newvalues = {"$set": {"value": value}}
         mycol.update_one(myquery, newvalues)
         mydoc = mycol.find_one(myquery, projection={"_id": False})
+
+        # Masukkan data history
+        historyDict = {
+            "idDevice": idDevice,
+            "ts": datetime.now(),
+            "value": value,
+            "trigger": trigger
+        }
+        historyCol = mydb["history"]
+        historyCol.insert_one(historyDict)
+
         return dumps(mydoc)
     else:
         return jsonify([])
+
+# ===============
+# Data History Control
+# ===============
 
 
 app.run(host='0.0.0.0', port=8080, debug=True)

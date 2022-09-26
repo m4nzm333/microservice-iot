@@ -36,17 +36,17 @@ while True:
                     print("Trigger {sensor} {currentValue} {jenis} {sensorData} set {control} to {controlValue}".format(
                         sensor=idSensor, currentValue=lastData['value'], jenis=jenis, sensorData=sensorValue, control=idControl, controlValue=controlValue))
                     requests.get('http://api-control:8080/setValue',
-                                params={'id': idControl, 'trigger': 'trigered', 'value': controlValue}, verify=False)
+                                params={'id': idControl, 'trigger': 'triggered', 'value': controlValue}, verify=False)
                 # Jika Jenis Sama Dengan
                 if jenis == 'equal' and lastData['value'] == sensorValue:
                     requests.get('http://api-control:8080/setValue',
-                                params={'id': idControl, 'trigger': 'trigered', 'value': controlValue}, verify=False)
+                                params={'id': idControl, 'trigger': 'triggered', 'value': controlValue}, verify=False)
                     print("Trigger {sensor} {currentValue} {jenis} {sensorData} set {control} to {controlValue}".format(
                         sensor=idSensor, currentValue=lastData['value'], jenis=jenis, sensorData=sensorValue, control=idControl, controlValue=controlValue))
                 # Jika Jenis Kurang Dari
                 if jenis == 'less than' and lastData['value'] <= sensorValue:
                     requests.get('http://api-control:8080/setValue',
-                                params={'id': idControl, 'trigger': 'trigered', 'value': controlValue}, verify=False)
+                                params={'id': idControl, 'trigger': 'triggered', 'value': controlValue}, verify=False)
                     print("Trigger {sensor} {currentValue} {jenis} {sensorData} set {control} to {controlValue}".format(
                         sensor=idSensor, currentValue=lastData['value'], jenis=jenis, sensorData=sensorValue, control=idControl, controlValue=controlValue))
     
