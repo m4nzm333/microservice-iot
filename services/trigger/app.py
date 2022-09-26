@@ -19,6 +19,8 @@ while True:
         controlValue = trigger['controlValue']
         jenis = trigger['jenis']
 
+        print(trigger)
+
         # Get Last Data
         lastData = requests.get(
             'http://api-sensor:8080/getLastDataById', params={"id": idSensor})
