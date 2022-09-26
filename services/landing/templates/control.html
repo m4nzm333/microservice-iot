@@ -219,7 +219,7 @@
                             url: `${baseApiURL}/control/toggle`,
                             data: { id: idDevice }
                         });
-                        if (respond.value == 0) {
+                        if (respond.value) {
                             console.log('trigered')
                             $(this).removeClass('badge-danger');
                             $(this).addClass('badge-success');
