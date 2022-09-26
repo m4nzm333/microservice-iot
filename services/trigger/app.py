@@ -31,7 +31,7 @@ while True:
         # If Last data Exist
         if lastData and control:
 
-            if control['value'] != trigger['value']:
+            if control['value'] != controlValue:
                 # Toleransi last data sebesar 5 menit sebelumnya
                 lastDataTime = datetime.strptime(
                     lastData['ts'], '%Y-%m-%d %H:%M:%S')
