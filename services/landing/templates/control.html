@@ -125,8 +125,58 @@
         </div>
     </div>
 
+    <div class="modal fade" id="modalHistory" tabindex="-1" role="dialog" aria-labelledby="modalHistoryLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalHistoryLabel"></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="formFilterTanggal" action="#" method="post">
+                        <div class="form-group row">
+                            <label for="tanggal" class="col-4 col-md-2">Tanggal</label>
+                            <div class="col-6">
+                                <input type="text" class="form-control" id="tanggal" name="tanggal" placeholder="Tanggal">
+                            </div>
+                            <div class="col-3">
+                                <button class="btn btn-outline-primary">
+                                    <i class="fa fa-filter"></i> Terapkan
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                    <div class="table-responsive">
+                        <table class="table table-striped w-100" id="tableHistory">
+                            <thead>
+                                <tr>
+                                    <th>Waktu</th>
+                                    <th>Value</th>
+                                    <th>Jenis</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Kembali</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script defer>
         var baseApiURL = 'http://api.myiot.com';
+
+        $("#tanggal").datepicker({
+            format: "yyyy-mm-dd",
+            language: "id",
+            todayBtn: "linked",
+            todayHighlight: true
+        });
 
         async function initDatatable() {
             var respond = await $.ajax({
@@ -153,7 +203,7 @@
                             return `<button class="btn btn-sm btn-primary btnEdit" data-id="${data}" data-nama="${row.nama}">
                                     <i class="fa fa-edit"></i>
                                 </button>
-                                <button class="btn btn-sm btn-info btnGraph" data-id="${data}" data-nama="${row.nama}">
+                                <button class="btn btn-sm btn-info btnHistory" data-id="${data}" data-nama="${row.nama}">
                                     <i class="fa fa-history"></i>
                                 </button>
                                 <button class="btn btn-sm btn-danger btnDelete" data-id="${data}" data-nama="${row.nama}">
@@ -196,7 +246,6 @@
                         $("#id").addClass('disabled');
                         $("#nama").val(respond.nama);
                         $("#rumah").val(respond.rumah);
-                        console.log(respond)
                         $("#model").val(respond.jenis.model);
                         $("#value").val(respond.value);
                     });
@@ -207,6 +256,27 @@
                         $("#modalDeleteLabel").text(`${nama} (${idDevice})`);
                         $("#btnConfirmDelete").attr('data-id', idDevice);
                         $("#modalDelete").modal('show');
+                    });
+
+                    $(".btnHistory").click(async function () {
+
+                        var idDevice = $(this).data('id');
+                        var respond = await $.ajax({
+                            url: `${baseApiURL}/control/getHistoryByIdDate`,
+                            data: {
+                                'id': idDevice
+                            }
+                        });
+                        $("#modalHistory").modal('show');
+                        $("#tableHistory").dataTable({
+                            destroy: true,
+                            data: respond,
+                            columns: [
+                                { data: "ts" },
+                                { data: "value" },
+                                { data: "trigger" }
+                            ]
+                        })
                     });
                 }
             });
@@ -248,6 +318,28 @@
             })
             ev.preventDefault();
         });
+    
+        $("#formFilterTanggal").submit(async function (e) {
+            e.preventDefault();
+            var idAlat = $(this).data('id');
+            var nama = $(this).data('nama');
+            var respond = await $.ajax({
+                url: `${baseApiURL}/control/getHistoryByIdDate`,
+                data: {
+                    id: idAlat,
+                    date: $("#tanggal").val()
+                }
+            });
+            $("#tableHistory").dataTable({
+                destroy: true,
+                data: respond,
+                columns: [
+                    { data: "ts" },
+                    { data: "value" },
+                    { data: "trigger" }
+                ]
+            })
+        })
     </script>
 
 </body>

@@ -159,7 +159,7 @@ def toogleControlById():
         # Masukkan data history
         historyDict = {
             "idDevice": idDevice,
-            "ts": datetime.now(),
+            "ts": datetime.now() + timedelta(hours=-8),
             "value": value,
             "trigger": trigger
         }
@@ -189,7 +189,7 @@ def setValueById():
         # Masukkan data history
         historyDict = {
             "idDevice": idDevice,
-            "ts": datetime.now(),
+            "ts": datetime.now() + timedelta(hours=-8),
             "value": value,
             "trigger": trigger
         }
@@ -203,6 +203,38 @@ def setValueById():
 # ===============
 # Data History Control
 # ===============
+
+
+@app.route('/getHistoryByIdDate')
+def getHistoryByIdDate():
+    idDevice = request.args.get('id')
+    date = request.args.get('date', datetime.now().strftime("%Y-%m-%d"))
+
+    dateStartObj = datetime.strptime(
+        date + " 00:00:00", "%Y-%m-%d %H:%M:%S") - timedelta(hours=8)
+    dateEndObj = datetime.strptime(
+        date + " 23:59:59", "%Y-%m-%d %H:%M:%S") - timedelta(hours=8)
+
+    myquery = {
+        "idDevice": idDevice,
+        'ts': {
+            '$gte': dateStartObj,
+            '$lte': dateEndObj
+        }
+    }
+    mycol = mydb["history"]
+    mydoc = mycol.find(myquery, projection={"_id": False})
+    mydoc = list(mydoc)
+
+    if mydoc:
+        dataReturn = []
+        for x in mydoc:
+            x['ts'] = (x['ts'] + timedelta(hours=8)).strftime("%Y-%m-%d %H:%M:%S")
+            dataReturn.append(x)
+
+        return jsonify(mydoc)
+    else:
+        return jsonify([])
 
 
 app.run(host='0.0.0.0', port=8080, debug=True)
