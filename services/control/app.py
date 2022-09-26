@@ -140,15 +140,10 @@ def toogleControlById():
         "jenis.tipe": "control",
         "id": idDevice
     }
-    mydoc = mycol.find(myquery, projection={"data": False, "_id": False})
-    rowData = list(mydoc)
-    print(rowData)
-    if rowData:
-        json_data = dumps(rowData[0], indent=2)
-        # print(json_data.value)
-        json_data = json.loads(json_data)
-        value = 0
-        if json_data['value'] == 1:
+    mydoc = mycol.find_one(myquery, projection={"data": False, "_id": False})
+    if mydoc:
+        mydoc = 0
+        if mydoc['value']:
             value = 0
             newvalues = {"$set": {"value": value}}
             mycol.update_one(myquery, newvalues)
@@ -229,7 +224,8 @@ def getHistoryByIdDate():
     if mydoc:
         dataReturn = []
         for x in mydoc:
-            x['ts'] = (x['ts'] + timedelta(hours=8)).strftime("%Y-%m-%d %H:%M:%S")
+            x['ts'] = (x['ts'] + timedelta(hours=8)
+                       ).strftime("%Y-%m-%d %H:%M:%S")
             dataReturn.append(x)
 
         return jsonify(mydoc)
