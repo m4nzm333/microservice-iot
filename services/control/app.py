@@ -144,11 +144,11 @@ def toogleControlById():
     if mydoc:
         if mydoc['value']:
             mydoc['value'] = 0
-            newvalues = {"$set": {"value": value}}
+            newvalues = {"$set": {"value": mydoc['value']}}
             mycol.update_one(myquery, newvalues)
         else:
             mydoc['value'] = 1
-            newvalues = {"$set": {"value": value}}
+            newvalues = {"$set": {"value": mydoc['value']}}
             mycol.update_one(myquery, newvalues)
         # Masukkan data history
         historyDict = {
