@@ -141,26 +141,26 @@ def toogleControlById():
         "id": idDevice
     }
     mydoc = mycol.find_one(myquery, projection={"_id": False})
-    if mydoc: 
+    if mydoc:
         if mydoc['value']:
-            value = 0
+            mydoc['value'] = 0
             newvalues = {"$set": {"value": value}}
             mycol.update_one(myquery, newvalues)
         else:
-            value = 1
+            mydoc['value'] = 1
             newvalues = {"$set": {"value": value}}
             mycol.update_one(myquery, newvalues)
         # Masukkan data history
         historyDict = {
             "idDevice": idDevice,
             "ts": datetime.now() + timedelta(hours=-8),
-            "value": value,
+            "value": mydoc['value'],
             "trigger": trigger
         }
         historyCol = mydb["history"]
         historyCol.insert_one(historyDict)
 
-        return json_data
+        return mydoc
     else:
         return jsonify([])
 
