@@ -18,7 +18,6 @@ while True:
         idControl = trigger['control']['id']
         controlValue = trigger['controlValue']
         jenis = trigger['jenis']
-
         # Get Last Data
         lastData = requests.get(
             'http://api-sensor:8080/getLastDataById', params={"id": idSensor})
@@ -27,6 +26,10 @@ while True:
         control = requests.get(
             'http://api-control:8080/getById', params={"id": idControl})
         control = control.json()
+
+        print(trigger)
+        print(control)
+        print("\n")
 
         # If Last data Exist
         if lastData and control:
