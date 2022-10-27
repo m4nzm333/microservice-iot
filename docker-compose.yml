@@ -231,6 +231,34 @@ services:
       - traefik.http.routers.api-trigger.service=api-trigger
       - traefik.http.services.api-trigger.loadbalancer.server.port=8080
 
+  api-user:
+    image: python:3.10.6-slim-bullseye
+    container_name: api-user
+    hostname: api-user
+    volumes:
+      - ./services/api-user:/usr/src/app
+    environment:
+      DB_HOSTNAME: mongodb
+      DB_PORT: 27017
+      DB_USERNAME: root
+      DB_PASSWORD: 123456
+      DB_NAME: myiot
+      TZ: Asia/Makassar
+    networks:
+      - services-db
+      - services-proxy
+    working_dir: /usr/src/app
+    command: /bin/bash -c "pip3 install -r requirements.txt && python app.py"
+    labels:
+      - traefik.enable=true
+      - traefik.http.middlewares.api-user.stripprefix.forceslash=false
+      - traefik.http.middlewares.api-user.stripprefix.prefixes=/user/,/user
+      - traefik.http.routers.api-user.entrypoints=web
+      - traefik.http.routers.api-user.middlewares=api-user
+      - traefik.http.routers.api-user.rule=(Host(`api.myiot.com`) && (PathPrefix(`/user/`) || PathPrefix(`/user`)))
+      - traefik.http.routers.api-user.service=api-user
+      - traefik.http.services.api-user.loadbalancer.server.port=8080
+
   # ===============
   # Scheduler
   # ===============

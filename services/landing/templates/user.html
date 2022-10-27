@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>User | My Smarthome</title>
+
+    {% include('includes/head.html') %}
+</head>
+
+<body id="page-top">
+    <div id="wrapper">
+        {% include('includes/sidebar.html')%}
+        <div id="content-wrapper" class="d-flex flex-column">
+            <div id="content">
+                {% include('includes/topbar.html') %}
+                <div class="container-fluid">
+                    <h1 class="h3 mb-4 text-gray-800">Jadwal</h1>
+                    <div class="row">
+                        <dir class="col-12">
+                            <div class="card shadow">
+                                <div class="card-body table-responsive">
+                                    <button class="btn btn-primary" id="btnTambah">
+                                        <i class="fa fa-plus"></i> Tambah User/Rumah
+                                    </button>
+                                    <hr>
+                                    <table id="tableJadwal" class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Nama Jadwal</th>
+                                                <th>Jenis Jadwal</th>
+                                                <th>Mulai</th>
+                                                <th>Nama Kontrol</th>
+                                                <th>Set Status</th>
+                                                <th>Aksi</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </dir>
+                    </div>
+                </div>
+            </div>
+            {% include('includes/footer.html') %}
+        </div>
+    </div>
+    {% include('includes/scrollup.html') %}
+    {% include('includes/script.html') %}
+
+    <div class="modal fade" id="modalUser" tabindex="-1" role="dialog" aria-labelledby="modalUserLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <form action="#" method="post" id="formUser">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modalUserLabel">Tambah User</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="container">
+                            <div class="form-group row">
+                                <label for="id" class="col-4">Id User</label>
+                                <div class="col-8">
+                                    <input type="text" name="id" id="id" class="form-control" placeholder="Id Jadwal" required>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="nama" class="col-4">Nama User</label>
+                                <div class="col-8">
+                                    <input type="text" name="nama" id="nama" class="form-control" placeholder="Nama Jadwal" required>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="rumah" class="col-4">Id Rumah</label>
+                                <div class="col-8">
+                                    <input type="text" name="rumah" id="rumah" class="form-control" placeholder="Nama Jadwal" required>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Kembali</button>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fa fa-save"></i> Simpan
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalDelete" tabindex="-1" role="dialog" aria-labelledby="modalDeleteLabel" aria-hidden="true">
+        <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    Hapus User <b id="modalDeleteLabel"></b> ?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Kembali</button>
+                    <button type="button" class="btn btn-danger" id="btnConfirmDelete">
+                        <i class="fa fa-trash"></i> Hapus
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script defer>
+        var baseApiURL = 'http://api.myiot.com';
+
+        $("#jamHarian").clockpicker()
+
+        async function initDatatable() {
+            var respond = await $.ajax({
+                url: `${baseApiURL}/scheduler/getAll`
+            });
+            var control = await $.ajax({
+                url: `${baseApiURL}/control/getAll`
+            });
+            $("#control").html('')
+            control.forEach(e => {
+                $("#control").append(`<option value="${e.id}">${e.nama}</option>`)
+            });
+
+            $("#tableJadwal").dataTable({
+                data: respond,
+                destroy: true,
+                columns: [{
+                        data: "nama"
+                    },
+                    {
+                        data: "jenis",
+                        render: function(data, type, row) {
+                            return data.tipe
+                        },
+                    },
+                    {
+                        data: "jenis",
+                        render: function(data, type, row) {
+                            if (data.tipe == 'harian') return data.jam
+                            else return ''
+                        },
+                    },
+                    {
+                        data: "control",
+                        render: function(data, type, row) {
+                            return data.nama;
+                        },
+                    },
+                    {
+                        data: "value"
+                    },
+                    {
+                        data: "id",
+                        render: function(data, type, row) {
+                            return `<button class="btn btn-sm btn-primary btnEdit" data-id="${data}" data-nama="${row.nama}">
+                                    <i class="fa fa-edit"></i>
+                                </button>
+                                <button class="btn btn-sm btn-danger btnDelete" data-id="${data}" data-nama="${row.nama}">
+                                    <i class="fa fa-trash"></i>
+                                </button>`;
+                        },
+                    },
+                ],
+                drawCallback: function() {
+                    $(".btnEdit").click(async function() {
+                        // var idJadwal = $(this).data('id');
+                        // var respond = await $.ajax({
+                        //     url: `${baseApiURL}/scheduler/getById`,
+                        //     data: {
+                        //         id: idJadwal
+                        //     }
+                        // });
+                        // $("#formJadwal").trigger('reset');
+                        // $("#formJadwal").attr('action', `${baseApiURL}/scheduler/updateById`);
+                        // $("#modalJadwalLabel").text(`Edit Jadwal ${respond.nama}`);
+                        // $("#modalJadwal").modal('show');
+                        // $("#id").val(idJadwal);
+                        // $("#id").attr('disabled', 'disabled');
+                        // $("#id").addClass('disabled');
+                        // $("#nama").val(respond.nama);
+                        // $("#rumah").val(respond.rumah);
+                        // $("#control").val(respond.control);
+                        // $("#jamHarian").val(respond.jenis.jam);
+                        // $("#value").val(respond.value);
+                    });
+
+                    $(".btnDelete").click(async function() {
+                        // var idJadwal = $(this).data('id');
+                        // var nama = $(this).data('nama');
+                        // $("#modalDeleteLabel").text(`${nama} (${idJadwal})`);
+                        // $("#btnConfirmDelete").attr('data-id', idJadwal);
+                        // $("#modalDelete").modal('show');
+                    });
+                }
+
+            });
+        }
+
+        initDatatable();
+
+        $("#btnTambah").click(() => {
+            // $("#formJadwal").trigger('reset');
+            // $("#formJadwal").attr('action', `${baseApiURL}/scheduler/insert`);
+            // $("#modalJadwalLabel").text('Tambah Jadwal');
+            // $("#id").removeAttr('disabled');
+            // $("#id").removeClass('disabled');
+            // $("#modalJadwal").modal('show');
+        });
+
+        $("#btnConfirmDelete").click(function() {
+            // var idJadwal = $(this).data('id');
+            // $.ajax({
+            //     url: `${baseApiURL}/scheduler/deleteById?id=${idJadwal}`
+            // });
+            // $("#modalDelete").modal('hide');
+            // initDatatable();
+        });
+
+
+        $("#formJadwal").submit(function(ev) {
+            // $.ajax({
+            //     type: 'post',
+            //     url: $("#formJadwal").attr('action'),
+            //     data: {
+            //         'id': $("#id").val(),
+            //         'nama': $("#nama").val(),
+            //         'rumah': $("#rumah").val(),
+            //         'jamHarian': $("#jamHarian").val(),
+            //         'control': $("#control").val(),
+            //         'value': $("#value").val(),
+            //     },
+            //     success: function () {
+            //         initDatatable();
+            //         $("#modalJadwal").modal('hide');
+            //     }
+            // })
+            // ev.preventDefault();
+        });
+    </script>
+
+</body>
+
+</html>

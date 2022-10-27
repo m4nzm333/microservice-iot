@@ -8,7 +8,8 @@ app = Flask(__name__)
 def index():
     return render_template('login.html')
 
-@app.route('/dashboard', methods = ['POST', 'GET'])
+
+@app.route('/dashboard', methods=['POST', 'GET'])
 def dashboard():
     return render_template('dashboard.html')
 
@@ -31,6 +32,11 @@ def scheduler():
 @app.route('/trigger')
 def trigger():
     return render_template('trigger.html')
+
+
+@app.route('/user')
+def user():
+    return render_template('user.html')
 
 
 app.run(host='0.0.0.0', port=8080, debug=True)
